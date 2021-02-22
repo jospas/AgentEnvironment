@@ -1,0 +1,209 @@
+service: agent-environment
+
+provider:
+  name: aws
+  region: ${opt:region, 'ap-southeast-2'}
+  runtime: nodejs12.x
+  endpointType: REGIONAL
+  stage: ${opt:stage, 'dev'}
+  profile: ${opt:profile, 'connect'}
+  logRetentionInDays: 14
+  apiGateway:
+    shouldStartNameWithService: true
+
+custom:
+  origin: ${opt:origin, 'CHANGEME'}
+  apiKey: ${opt:apiKey, 'CHANGEME'}
+  s3Prefix: ${opt:s3Prefix, 'agentdata'}
+
+package:
+  individually: true 
+
+functions:
+  capturedata:
+    handler: lambda/CaptureData.handler
+    name: '${self:provider.stage}-${self:service}-capturedata'
+    description: 'Captures agent data and stores it in DynamoDB'
+    role: !GetAtt LambdaRole.Arn
+    events:
+      - http:
+          path: agentenvironment/data
+          method: post
+          cors: true   
+    package:
+      exclude:
+        - '**'
+      include:
+        - 'lambda/CaptureData.js'
+        - 'node_modules/**'
+    memorySize: 128
+    timeout: 29
+    environment:
+      REGION: '${self:provider.region}'
+      STAGE: '${self:provider.stage}'
+      ORIGIN: '${self:custom.origin}'
+      AGENT_DATA_TABLE: !Ref AgentDataTable 
+
+  verifylogin:
+    handler: lambda/VerifyLogin.handler
+    name: '${self:provider.stage}-${self:service}-verifylogin'
+    description: 'Verifies a login'
+    role: !GetAtt LambdaRole.Arn
+    package:
+      exclude:
+        - '**'
+      include:
+        - 'lambda/VerifyLogin.js'
+        - 'node_modules/**'
+    memorySize: 128
+    timeout: 29
+    environment:
+      REGION: '${self:provider.region}'
+      STAGE: '${self:provider.stage}'
+      API_KEY: '${self:custom.apiKey}'
+      ORIGIN: '${self:custom.origin}'
+    events:
+      - http:
+          path: agentenvironment/login
+          method: get
+          cors: true
+
+  processstream:
+    handler: lambda/ProcessStream.handler
+    name: '${self:provider.stage}-${self:service}-processstream'
+    description: 'Processes sream data from DynamoDB'
+    role: !GetAtt LambdaRole.Arn
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [AgentDataTable, StreamArn]
+    package:
+      exclude:
+        - '**'
+      include:
+        - 'lambda/ProcessStream.js'
+        - 'node_modules/**'
+    memorySize: 128
+    timeout: 60
+    environment:
+      REGION: '${self:provider.region}'
+      STAGE: '${self:provider.stage}'
+      AGENT_DATA_TABLE: !Ref AgentDataTable
+      S3_BUCKET: !Ref S3BucketData
+      S3_PREFIX: '${self:custom.s3Prefix}'  
+
+resources:
+  Description: 'Amazon Connect Agent Environment'
+  Resources:
+
+    LambdaRole:
+      Type: 'AWS::IAM::Role'
+      Properties:
+        RoleName: !Join [ '-', [ '${self:provider.stage}', !Ref 'AWS::StackName', !Ref 'AWS::Region', 'role' ]]
+        AssumeRolePolicyDocument: 
+          Version: '2012-10-17'
+          Statement: 
+            - Effect: 'Allow'
+              Principal: 
+                Service: 
+                  - 'lambda.amazonaws.com'
+              Action: 
+                - 'sts:AssumeRole'
+        ManagedPolicyArns:
+          - !Ref LambdaPolicy 
+
+    LambdaPolicy:
+      Type: 'AWS::IAM::ManagedPolicy'
+      Properties:
+        ManagedPolicyName: !Join [ '-', [ '${self:provider.stage}', !Ref 'AWS::StackName', !Ref 'AWS::Region', 'policy' ]]
+        Description: 'Managed policy for lambda execution'
+        PolicyDocument: 
+          Version: '2012-10-17'
+          Statement:
+
+            - Effect: Allow
+              Action: 
+                - s3:PutObject
+              Resource:
+                - !GetAtt S3BucketData.Arn
+                - !Join [ '', [ !GetAtt S3BucketData.Arn, '/*' ]]
+            - Effect: Allow
+              Action: 
+                - dynamodb:PutItem
+                - dynamodb:Query
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+                - dynamodb:Scan
+                - dynamodb:UpdateItem
+                - dynamodb:DescribeStream
+                - dynamodb:GetRecords
+                - dynamodb:GetShardIterator
+                - dynamodb:ListStreams
+                - dynamodb:ListShards
+              Resource: 
+                - !Join [ ':', [ 'arn:aws:dynamodb', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'table/${self:provider.stage}-agent-environment-data' ]]
+                - !Join [ ':', [ 'arn:aws:dynamodb', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'table/${self:provider.stage}-agent-environment-data/*' ]]                
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: 
+                - !Join [ ':', [ 'arn:aws:logs', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'log-group:/aws/lambda/*:*:*' ] ]
+
+    AgentDataTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: '${self:provider.stage}-${self:service}-data'
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: captureDate
+            AttributeType: S            
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+          - AttributeName: captureDate
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+    S3BucketSite:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: !Join [ '-', [ '${self:provider.stage}', '${self:service}', 'site', !Ref AWS::Region, !Ref AWS::AccountId ]]
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    S3BucketData:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: !Join [ '-', [ '${self:provider.stage}', '${self:service}', 'data', !Ref AWS::Region, !Ref AWS::AccountId ]]
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000              

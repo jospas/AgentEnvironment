@@ -1,0 +1,6 @@
+.serverless
+node_modules
+.DS_Store
+scripts
+notes.md
+raw/

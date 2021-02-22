@@ -1,0 +1,34 @@
+{
+  "name": "agentenvironment",
+  "version": "1.0.0",
+  "description": "Captures Amazon Connect Agent data and stores it in S3 for collection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jospas/AgentEnvironment.git"
+  },
+  "keywords": [
+    "Amazon",
+    "Connect",
+    "Agent",
+    "Environment",
+    "Serverless",
+    "DynamoDB",
+    "Network",
+    "Hardware",
+    "Microphone"
+  ],
+  "author": "jospas@amazon.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/jospas/AgentEnvironment/issues"
+  },
+  "homepage": "https://github.com/jospas/AgentEnvironment#readme",
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.1"
+  }
+}
