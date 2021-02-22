@@ -1,0 +1,357 @@
+<div class="text-center py-4 bg-light">
+  <div class="container">
+    <h1 class="display-4">Amazon Connect Agent Environment</h1>
+
+    <p class="lead">You have been send this link as your Amazon Connect administrator requires additional information about your working environment. Please answer the following questions and then submit your answers. This process should take less than 5 minutes to complete.</p>
+  </div>
+</div>
+
+<div id="stages" class="p-3">
+</div>
+
+<div class="container py-3">
+  <div class="formPage" id="identityPage" style="display:none;">
+    <form>
+      <div class="form-group">
+        <label for="apiKey">API key</label>
+        <input type="text" class="form-control" id="apiKey" aria-describedby="apiKeyHelp" value="55ddb96e-6fff-11eb-9439-0242ac130002" placeholder="API key">
+        <small id="apiKeyHelp" class="form-text text-muted">Enter the API key provided by your adminstrator</small>
+      </div>
+      <div class="form-group">
+        <label for="email">Work email</label>
+        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" value="jospas@amazon.com" placeholder="Email address">
+        <small id="emailHelp" class="form-text text-muted">What is your work email address?</small>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-primary" onClick="verifyIdentify();">Next <i class="fas fa-chevron-circle-right"></i></button>
+      </div>
+    </form>
+  </div>
+  <div class="formPage" id="locationPage" style="display:none;">
+    <form>
+      <div class="form-group">
+        <label for="location">Work location</label>
+        <select id="location" class="form-control" aria-describedby="locationHelp">
+          <option></option>
+          <option value="HOME">Working from home</option>
+          <option value="OFFICE">Working from the office</option>
+          <option value="CALLCENTRE">Working from the call centre</option>
+        </select>
+        <small id="apiKeyHelp" class="form-text text-muted">Where are you currently working from?</small>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-primary" onClick="verifyLocation();">Next <i class="fas fa-chevron-circle-right"></i></button>
+      </div>
+    </form>
+  </div>
+
+  <div class="formPage" id="networkPage" style="display:none;">
+    <form>
+      <div class="form-group">
+        <label for="networkConnection">Network connection</label>
+        <select id="networkConnection" class="form-control" aria-describedby="networkConnectionHelp">
+          <option></option>
+          <option value="WIRELESS">Wireless connection</option>
+          <option value="WIRED">Wired connection</option>s
+        </select>
+        <small id="networkConnectionHelp" class="form-text text-muted">How is your computer connected to the network?</small>
+      </div>
+      <div class="form-group">
+        <label for="internetConnection">Internet connection</label>
+        <select id="internetConnection" class="form-control" aria-describedby="internetConnectionHelp">
+          <option></option>
+          <option value="ADSL">ADSL internet</option>
+          <option value="CABLE">Cable internet</option>
+          <option value="FIBRE">Fibre internet</option>
+          <option value="MOBILE">Tethered mobile phone</option>
+          <option value="WIRELESS">Wireless internet</option>
+          <option value="OFFICE">Office or Call Center network</option>
+          <option value="OTHER">Other</option>
+        </select>
+        <small id="internetConnectionHelp" class="form-text text-muted">What type of connection to the internet do you have?</small>
+      </div>
+      <div class="form-group">
+        <label for="internetUserCount">Shared internet users</label>
+        <input type="number" class="form-control" id="internetUserCount" aria-describedby="internetUserCountHelp" value="0">
+        <small id="internetUserCountHelp" class="form-text text-muted">Approximately how many other users share your internet connection?</small>
+      </div>
+      <div class="form-group">
+        <label for="internetUserType">Shared internet use</label>
+        <select id="internetUserType" class="form-control" aria-describedby="internetUserTypeHelp">
+          <option></option>
+          <option value="BUSINESS">Business internet use</option>
+          <option value="HOME">Home internet use</option>
+          <option value="TELEPHONY">Telephony / call center internet use</option>
+          <option value="UNSURE">I don't know</option>
+          <option value="NONE">I am the only user</option>
+        </select>
+        <small id="internetUserTypeHelp" class="form-text text-muted">What are the other users using the internet for?</small>
+      </div>
+      <div class="form-group">
+        <label for="internetProvider">Internet provider</label>
+        <input type="text" class="form-control" id="internetProvider" aria-describedby="internetProviderHelp" value="{{results.geoIP.organization_name}}" placeholder="Your internet provider">  
+        <small id="internetProviderHelp" class="form-text text-muted">Who is your internet provider?</small>
+      </div>
+      <div class="form-group">
+        <label for="downloadSpeed">Download speed (Mbps)</label>
+        <input type="text" class="form-control" id="downloadSpeed" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>        
+        <label for="uploadSpeed" class="pt-3">Upload speed (Mbps)</label>
+        <input type="text" class="form-control" id="uploadSpeed" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>
+        <label for="latency" class="pt-3">Latency (ms)</label>
+        <input type="text" class="form-control" id="latency" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>
+        <small id="speedTestHelp" class="form-text text-muted">Run the speed test to calculate the speed of your internet connection</small>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-primary" onClick="runSpeedTest();">Run internet speed test</button>
+        <button type="button" id="networkNextButton" class="btn btn-primary" onClick="verifyNetwork();" style="display:none;">Next <i class="fas fa-chevron-circle-right"></i></button>
+      </div>
+    </form>
+  </div>
+
+  <div class="formPage" id="computerPage" style="display:none;">
+    <form>
+      
+      <div class="text-center">
+        <button type="button" class="btn btn-primary" onClick="verifyComputer();">Next <i class="fas fa-chevron-circle-right"></i></button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  async function verifyIdentify(e)
+  {
+    var results = await getResults();
+    delete results.apiKey;
+    delete results.email;
+
+    var apiKey = $('#apiKey').val();
+    var email = $('#email').val();
+
+    if (apiKey !== '' && email !== '')
+    {
+      var loginResults = await checkLogin(apiKey);
+
+      if (loginResults.success)
+      {
+        results.apiKey = apiKey;
+        results.email = email;
+        results.loginResults = loginResults;
+        saveResults(results);
+        pageSuccess('identity');
+      }
+      else
+      {
+        pageError('identity');
+        alert('Your API key is not valid, please check with your supervisor');
+      }
+    }
+    else
+    {
+      pageError('identity');
+      alert('Please complete all identity fields');
+    }
+  }
+
+  async function verifyLocation(e)
+  {
+    var results = await getResults();
+    delete results.location;
+
+    var location = $('#location').val();
+
+    if (location !== '')
+    {
+      results.location = location;
+
+      saveResults(results);
+      pageSuccess('location');
+    }
+    else
+    {
+      pageError('location');
+      alert('Please complete all location fields');
+    }
+  } 
+
+  async function verifyNetwork(e)
+  {
+    var results = await getResults();
+    delete results.networkConnection;
+    delete results.internetConnection;
+    delete results.internetUserCount;
+    delete results.internetUserType;
+
+    var networkConnection = $('#networkConnection').val();
+    var internetConnection = $('#internetConnection').val();
+    var internetUserCount = $('#internetUserCount').val();
+    var internetUserType = $('#internetUserType').val();
+
+    var downloadSpeed = $('#downloadSpeed').val();
+    var uploadSpeed = $('#uploadSpeed').val();
+
+    var isNumber = /^\d+$/;
+
+    if (downloadSpeed === '' || uploadSpeed === '' || latency === '')
+    {
+      pageError('network');
+      alert('Please run the network speed tests');
+      return;
+    }
+
+    if (networkConnection !== '' && 
+      internetConnection !== '' && 
+      internetUserCount !== '' &&
+      internetUserType !== '')
+    {
+      if (!isNumber.test(internetUserCount))
+      {
+        pageError('network');
+        alert('Please provide a whole number for the number of shared internet users');
+        return;
+      }
+
+      results.networkConnection = networkConnection;
+      results.internetConnection = internetConnection;
+      results.internetUserCount = internetUserCount;
+      results.internetUserType = internetUserType;
+
+      saveResults(results);
+      pageSuccess('network');
+    }
+    else
+    {
+      pageError('network');
+      alert('Please complete all network fields');
+    }
+  }  
+
+  async function verifyComputer()
+  {
+    var parser = new UAParser();
+    var results = await getResults();
+    saveResults(results);
+    pageSuccess('computer');
+  }
+
+  function changePage()
+  {
+    $('.formPage').hide();
+
+    var stages = getStages();
+    var stageNames = Object.keys(stages);
+
+    stageNames.forEach(stageName =>
+    {
+      var stage = stages[stageName];
+
+      if (stage.current)
+      {
+        $('#' + stageName + 'Page').show();
+      }
+    });
+  }
+
+  /**
+   * Runs an internet speed test by uploading and downloading files
+   */
+  async function runSpeedTest(e)
+  {
+    try
+    {
+      var results = await getResults();
+      console.log('Refretched signed upload url');
+
+      results.loginResult = await checkLogin(results.apiKey);
+
+      $('#downloadSpeed').attr('placeholder', 'Calculating download speed...');
+      $('#downloadSpeed').val('');
+      $('#uploadSpeed').attr('placeholder', 'Pending...');
+      $('#uploadSpeed').val('');
+      $('#latency').attr('placeholder', 'Pending...');
+      $('#latency').val(''); 
+
+      var size = 50;
+      var seconds = await timeDownload(size);
+      var megabits = size * 8;
+      var megaBitsPerSec = megabits / seconds;
+
+      $('#downloadSpeed').val(megaBitsPerSec.toFixed(2));
+      $('#uploadSpeed').attr('placeholder', 'Calculating upload speed...');
+      $('#uploadSpeed').val('');
+
+      size = 10;
+      seconds = await timeUpload(size, results.loginResults.uploadUrl);
+      megabits = size * 8;
+      megaBitsPerSec = megabits / seconds;
+      $('#uploadSpeed').val(megaBitsPerSec.toFixed(2));
+      $('#latency').attr('placeholder', 'Calculating latency...');
+
+      iterations = 20;
+      var latency = await timeLatency();
+      $('#latency').val(latency);
+
+      $('#networkNextButton').show();
+    }
+    catch (error)
+    {
+      console.log('[ERROR] Speed tests failed to run', error);
+      pageError('network');
+      renderStages();
+      alert('Speed tests failed to run, please check your network connectivity');
+      return;
+    }
+  }
+
+  async function timeDownload(size, iterations)
+  {
+    var data = await axios.get('test_files/' + size + 'mb.test');
+    var resources = performance.getEntriesByType('resource');
+    var lastResource = resources[resources.length - 1];
+    console.log('Download: ' + JSON.stringify(lastResource, null, 2));
+    return (lastResource.responseEnd - lastResource.responseStart) / 1000;
+  }
+
+  /**
+   * Upload a file to S3
+   */
+  async function timeUpload(size, url)
+  {
+    var payload = [];
+    var bytes = size * 1024 * 1024;
+    for (var i = 0; i < bytes; i++)
+    {
+      payload.push(0);
+    }
+
+    var options = {
+      headers: {
+        ContentType: 'text/plain'
+      }
+    };
+
+    var actualUrl = url.substring(siteConfig.origin.length);
+    var data = await axios.put(actualUrl, payload, options);
+    var resources = performance.getEntriesByType('resource');
+    var lastResource = resources[resources.length - 1];
+    console.log('Upload: ' + JSON.stringify(lastResource, null, 2));
+    return (lastResource.responseStart - lastResource.requestStart) / 1000;
+  }
+
+  /**
+   * Download a small image from S3 and time it using performance timers
+   */
+  async function timeLatency()
+  {
+    var data = await axios.get('img/1x1.png?t=' + Math.floor(Math.random() * 100000));
+    var resources = performance.getEntriesByType('resource');
+    var lastResource = resources[resources.length - 1];
+    console.log('Latency: ' + JSON.stringify(lastResource, null, 2));
+    return Math.floor(lastResource.responseStart - lastResource.requestStart);
+  }  
+
+  renderStages();
+  changePage();
+</script>
+

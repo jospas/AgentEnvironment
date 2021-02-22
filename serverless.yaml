@@ -62,6 +62,8 @@ functions:
       STAGE: '${self:provider.stage}'
       API_KEY: '${self:custom.apiKey}'
       ORIGIN: '${self:custom.origin}'
+      UPLOAD_BUCKET: !Ref S3BucketSite
+      UPLOAD_KEY: 'test_files/uploaded.test'
     events:
       - http:
           path: agentenvironment/login
@@ -121,13 +123,15 @@ resources:
         PolicyDocument: 
           Version: '2012-10-17'
           Statement:
-
             - Effect: Allow
               Action: 
+                - s3:Get*
                 - s3:PutObject
               Resource:
                 - !GetAtt S3BucketData.Arn
                 - !Join [ '', [ !GetAtt S3BucketData.Arn, '/*' ]]
+                - !GetAtt S3BucketSite.Arn
+                - !Join [ '', [ !GetAtt S3BucketSite.Arn, '/*' ]]
             - Effect: Allow
               Action: 
                 - dynamodb:PutItem

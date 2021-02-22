@@ -11,7 +11,7 @@ exports.handler = async(event, context, callback) =>
   {
     console.log(JSON.stringify(event, null, '  '));
 
-    if (!verifyOrigin(event.requestContext.origin))
+    if (!verifyOrigin(event.headers.origin))
     {
       callback(null, buildRejectedResponse(403, 'Invalid request origin'));
       return; 

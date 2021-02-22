@@ -1,0 +1,89 @@
+<div class="text-center py-4 bg-light">
+  <div class="container">
+    <h1 class="display-4">Help</h1>
+
+    <p class="lead">Learn how to configure and deploy Amazon Connect Wallboards.</p>
+
+  </div>
+</div>
+
+<div class="container py-3">
+
+  <!--
+
+  <h3 class="py-3">Deploying</h3>
+
+  <p>
+    TODO detail deployment
+  </p>
+
+  <h3 class="py-3">Logging in</h3>
+
+  <p>
+    To log in the user must provide a valid API key on the log in screen. Please ask your administrator for an API key.
+  </p>
+
+  <h3 class="py-3">Configuration</h3>
+
+  <p>
+    Once logged in a user may configure wallboards to display selected metrics.
+  </p>
+
+  <p>
+    TODO explain metrics types
+  </p>
+
+  -->
+
+  <h3 class="py-3">Architecture</h3>
+
+  <p>
+    The solution utilises a serverless architecture with user access via a single page web application hosted in Amazon S3.
+  </p>
+
+  <p>
+    Users log-in with an API key and configure wall boards using the web application.
+  </p>
+
+  <p>
+    To view wallboards in real-time the web application establishes a secure websocket with Amazon API Gateway with active connection ids stored in an Amazon DynamoDB table via AWS Lambda functions.
+  </p>
+
+  <p>
+    A 1 minute Amazon CloudWatch Event triggers a Lambda function to continually fetch Amazon Connect real-time and historical metrics and broadcast them to listening clients via API Gateway their websocket. Stale connections are removed from DynamoDB when detected and broadcast messages are executed asynchronously.
+  </p>
+
+  <img src="img/manual/architecture.png" class="img-fluid">
+
+  <h3 class="py-3">Cost</h3>
+
+  <p>
+    The dominant infrastructure cost for the solution is the continually executing Lambda function configured with 256MB of RAM with an approximate cost of $10 USD per month.
+  </p>  
+
+  <p>
+    This is a free solution provided by the AWS Solution Architecture team and does not require any additional licensing just the minimal infrastructre costs detailed above.
+  </p>
+
+  <h3 class="py-3">Version</h3>
+
+  <p>
+    You are currently running version 1.0.6 (wallboard rotation)
+  </p> 
+
+</div>
+
+<div class="text-center py-4 bg-light">
+  <div class="container">
+    <h1 class="display-4">Need more help?</h1>
+
+    <p class="lead">Reach out to your local AWS Solutions Architect for more assistance.</p>
+
+  </div>
+</div>
+
+
+<script>
+
+
+</script>
