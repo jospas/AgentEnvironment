@@ -1,130 +1,169 @@
 
 <div class="text-center">
   <div class="row text-center">
+    <div class="col-md-6 py-2">
+      <div class="row text-center">
 
-    {{#if stages.identity.complete}}
-      <div class="col-sm text-center text-success">
-        <i class="fas fa-check-circle fa-3x"></i>
-        <br>
-        Identity
-      </div>
-    {{else if stages.identity.errored}}
-      <div class="col-sm text-center text-danger">
-        <i class="fas fa-times-circle fa-3x"></i>
-        <br>
-        Identity
-      </div>
-    {{else if stages.identity.current}}
-      <div class="col-sm text-center text-primary">
-        <i class="fas fa-chevron-circle-down fa-3x"></i>
-        <br>
-        Identity
-      </div>
-    {{else}}
-      <div class="col-sm text-center muted-circle">
-        <i class="far fa-circle fa-3x"></i>
-        <br>
-        Identity
-      </div>
-    {{/if}}
+      {{#if stages.identity.complete}}
+        <div class="col-sm text-center text-success">
+          <i class="fas fa-check-circle fa-3x"></i>
+          <br>
+          Identity
+        </div>
+      {{else if stages.identity.errored}}
+        <div class="col-sm text-center text-warning">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+          <br>
+          Identity
+        </div>
+      {{else if stages.identity.current}}
+        <div class="col-sm text-center text-primary">
+          <i class="fas fa-chevron-circle-down fa-3x"></i>
+          <br>
+          Identity
+        </div>
+      {{else}}
+        <div class="col-sm text-center muted-circle">
+          <i class="far fa-circle fa-3x"></i>
+          <br>
+          Identity
+        </div>
+      {{/if}}
 
-    {{#if stages.location.complete}}
-      <div class="col-sm text-center text-success">
-        <i class="fas fa-check-circle fa-3x"></i>
-        <br>
-        Location
-      </div>
-    {{else if stages.location.errored}}
-      <div class="col-sm text-center text-danger">
-        <i class="fas fa-times-circle fa-3x"></i>
-        <br>
-        Location
-      </div>
-    {{else if stages.location.current}}
-      <div class="col-sm text-center text-primary">
-        <i class="fas fa-chevron-circle-down fa-3x"></i>
-        <br>
-        Location
-      </div>
-    {{else}}
-      <div class="col-sm text-center muted-circle">
-        <i class="far fa-circle fa-3x"></i>
-        <br>
-        Location
-      </div>
-    {{/if}}
+      {{#if stages.location.complete}}
+        <div class="col-sm text-center text-success">
+          <i class="fas fa-check-circle fa-3x"></i>
+          <br>
+          Location
+        </div>
+      {{else if stages.location.errored}}
+        <div class="col-sm text-center text-warning">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+          <br>
+          Location
+        </div>
+      {{else if stages.location.current}}
+        <div class="col-sm text-center text-primary">
+          <i class="fas fa-chevron-circle-down fa-3x"></i>
+          <br>
+          Location
+        </div>
+      {{else}}
+        <div class="col-sm text-center muted-circle">
+          <i class="far fa-circle fa-3x"></i>
+          <br>
+          Location
+        </div>
+      {{/if}}
 
-    {{#if stages.network.complete}}
-      <div class="col-sm text-center text-success">
-        <i class="fas fa-check-circle fa-3x"></i>
-        <br>
-        Network
+      {{#if stages.network.complete}}
+        <div class="col-sm text-center text-success">
+          <i class="fas fa-check-circle fa-3x"></i>
+          <br>
+          Network
+        </div>
+      {{else if stages.network.errored}}
+        <div class="col-sm text-center text-warning">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+          <br>
+          Network
+        </div>
+      {{else if stages.network.current}}
+        <div class="col-sm text-center text-primary">
+          <i class="fas fa-chevron-circle-down fa-3x"></i>
+          <br>
+          Network
+        </div>
+      {{else}}
+        <div class="col-sm text-center muted-circle">
+          <i class="far fa-circle fa-3x"></i>
+          <br>
+          Network
+        </div>
+      {{/if}}
       </div>
-    {{else if stages.network.errored}}
-      <div class="col-sm text-center text-danger">
-        <i class="fas fa-times-circle fa-3x"></i>
-        <br>
-        Network
-      </div>
-    {{else if stages.network.current}}
-      <div class="col-sm text-center text-primary">
-        <i class="fas fa-chevron-circle-down fa-3x"></i>
-        <br>
-        Network
-      </div>
-    {{else}}
-      <div class="col-sm text-center muted-circle">
-        <i class="far fa-circle fa-3x"></i>
-        <br>
-        Network
-      </div>
-    {{/if}}
-
-    {{#if stages.computer.complete}}
-      <div class="col-sm text-center text-success">
-        <i class="fas fa-check-circle fa-3x"></i>
-        <br>
-        Computer
-      </div>
-    {{else if stages.computer.errored}}
-      <div class="col-sm text-center text-danger">
-        <i class="fas fa-times-circle fa-3x"></i>
-        <br>
-        Computer
-      </div>
-    {{else if stages.computer.current}}
-      <div class="col-sm text-center text-primary">
-        <i class="fas fa-chevron-circle-down fa-3x"></i>
-        <br>
-        Computer
-      </div>
-    {{else}}
-      <div class="col-sm text-center muted-circle">
-        <i class="far fa-circle fa-3x"></i>
-        <br>
-        Computer
-      </div>
-    {{/if}}
-
-    <div class="col-sm text-center muted-circle">
-      <i class="far fa-circle fa-3x"></i>
-      <br>
-      Browser
     </div>
-    <div class="col-sm text-center muted-circle">
-      <i class="far fa-circle fa-3x"></i>
-      <br>
-      Audio
-    </div>
-    <div class="col-sm text-center muted-circle">
-      <i class="far fa-circle fa-3x"></i>
-      <br>
-      Computer
-    </div>
-    <div class="col-sm text-center muted-circle">
-      <i class="far fa-circle fa-3x"></i>
-      <br>
-      Submit
+    <div class="col-md-6">
+      <div class="row text-center">    
+
+      {{#if stages.computer.complete}}
+        <div class="col-sm text-center text-success">
+          <i class="fas fa-check-circle fa-3x"></i>
+          <br>
+          Computer
+        </div>
+      {{else if stages.computer.errored}}
+        <div class="col-sm text-center text-warning">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+          <br>
+          Computer
+        </div>
+      {{else if stages.computer.current}}
+        <div class="col-sm text-center text-primary">
+          <i class="fas fa-chevron-circle-down fa-3x"></i>
+          <br>
+          Computer
+        </div>
+      {{else}}
+        <div class="col-sm text-center muted-circle">
+          <i class="far fa-circle fa-3x"></i>
+          <br>
+          Computer
+        </div>
+      {{/if}}
+
+      {{#if stages.audio.complete}}
+        <div class="col-sm text-center text-success">
+          <i class="fas fa-check-circle fa-3x"></i>
+          <br>
+          Audio
+        </div>
+      {{else if stages.audio.errored}}
+        <div class="col-sm text-center text-warning">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+          <br>
+          Audio
+        </div>
+      {{else if stages.audio.current}}
+        <div class="col-sm text-center text-primary">
+          <i class="fas fa-chevron-circle-down fa-3x"></i>
+          <br>
+          Audio
+        </div>
+      {{else}}
+        <div class="col-sm text-center muted-circle">
+          <i class="far fa-circle fa-3x"></i>
+          <br>
+          Audio
+        </div>
+      {{/if}}
+
+      {{#if stages.submit.complete}}
+        <div class="col-sm text-center text-success">
+          <i class="fas fa-check-circle fa-3x"></i>
+          <br>
+          Submit
+        </div>
+      {{else if stages.submit.errored}}
+        <div class="col-sm text-center text-warning">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+          <br>
+          Submit
+        </div>
+      {{else if stages.submit.current}}
+        <div class="col-sm text-center text-primary">
+          <i class="fas fa-chevron-circle-down fa-3x"></i>
+          <br>
+          Submit
+        </div>
+      {{else}}
+        <div class="col-sm text-center muted-circle">
+          <i class="far fa-circle fa-3x"></i>
+          <br>
+          Submit
+        </div>
+      {{/if}}
+      </div>
     </div>
   </div>
 </div>

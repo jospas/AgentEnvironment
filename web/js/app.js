@@ -387,17 +387,26 @@ async function getResults()
 {
   if (!isStored('results'))
   {
-    var results = {};
+    var results = {
+      objects: {}
+    };
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has('apiKey'))
+    {
+      results.apiKey = params.get('apiKey');
+    }
 
     var parsedUA = bowser.getParser(window.navigator.userAgent);
 
-    results.browser = parsedUA.parsedResult.browser;
-    results.os = parsedUA.parsedResult.os;
-    results.platform = parsedUA.parsedResult.platform;
-    results.engine = parsedUA.parsedResult.engine;
+    results.objects.browser = parsedUA.parsedResult.browser;
+    results.objects.os = parsedUA.parsedResult.os;
+    results.objects.platform = parsedUA.parsedResult.platform;
+    results.objects.engine = parsedUA.parsedResult.engine;
     results.userAgent = window.navigator.userAgent;
     results.ip = await getPublicIP();
-    results.geoIP = await getGeoIPData(results.ip);
+    results.objects.geoIP = await getGeoIPData(results.ip);
 
     storeObject('results', results);
   }
@@ -438,34 +447,53 @@ function getStages()
   {
     var stages = {
       identity: {
+        banner: true,
         current: true,
         complete: false,
         errored: false,
         next: 'location'
       },
       location: {
+        banner: false,
         current: false,
         complete: false,
         errored: false,
         next: 'network'
       },
       network: {
+        banner: false,
         current: false,
         complete: false,
         errored: false,
         next: 'computer'
       },
       computer: {
+        banner: false,
         current: false,
         complete: false,
         errored: false,
         next: 'audio'
       },
       audio: {
+        banner: false,
+        current: false,
+        complete: false,
+        errored: false,
+        next: 'submit'
+      },
+      submit: {
+        banner: false,
+        current: false,
+        complete: false,
+        errored: false,
+        next: 'done'
+      },
+      done: {
+        banner: false,
         current: false,
         complete: false,
         errored: false
-      }   
+      }
     };
 
     storeObject('stages', stages);
@@ -482,6 +510,40 @@ function saveStages(stages)
 function saveResults(results)
 {
   storeObject('results', results);
+}
+
+/**
+ * Sends results to the server
+ */
+async function sendResults(results)
+{
+  try
+  {
+    var options = {
+      headers: {
+        'x-api-key': results.apiKey
+      }
+    };
+
+    var body = {};
+    var keys = Object.keys(results);
+
+    keys.forEach(key => {
+      if (key !== 'objects' && key !== 'apiKey')
+      {
+        body[key] = results[key];
+      }
+    });
+
+    console.log('Sending data to the server: ' + JSON.stringify(body, null, 2));
+
+    await axios.post(siteConfig.api + '/data', body, options);
+  }
+  catch (error)
+  {
+    console.log('Failed to send results', error);
+    throw error;
+  }
 }
 
 async function checkLogin(apiKey)
@@ -529,14 +591,46 @@ function pageSuccess(currentStage)
 
   var nextPage = stages[currentStage].next;
 
-  stages[nextPage].current = true;
-  stages[nextPage].errored = false;
-  stages[nextPage].complete = false;
+  if (nextPage !== undefined)
+  {
+    stages[nextPage].current = true;
+    stages[nextPage].errored = false;
+    stages[nextPage].complete = false;
+    saveStages(stages);
+    renderStages();
+    changePage();
+  }
+  else
+  {
+    saveStages(stages);
+    renderStages();
+  }
+}
 
-  saveStages(stages);
+function changePage()
+{
+  $('.formPage').hide();
 
-  renderStages();
-  changePage();
+  var stages = getStages();
+  var stageNames = Object.keys(stages);
+
+  stageNames.forEach(stageName =>
+  {
+    var stage = stages[stageName];
+
+    if (stage.current)
+    {
+      $('#' + stageName + 'Page').show();
+      if (stage.banner)
+      {
+        $('#pageBanner').show();
+      }
+      else
+      {
+        $('#pageBanner').hide();
+      }
+    }
+  });
 }
 
 

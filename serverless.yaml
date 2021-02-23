@@ -41,6 +41,7 @@ functions:
     environment:
       REGION: '${self:provider.region}'
       STAGE: '${self:provider.stage}'
+      API_KEY: '${self:custom.apiKey}'
       ORIGIN: '${self:custom.origin}'
       AGENT_DATA_TABLE: !Ref AgentDataTable 
 

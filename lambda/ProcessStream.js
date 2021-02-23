@@ -64,10 +64,12 @@ function extractRecords(records, scanResponse)
   if (scanResponse.Items !== undefined)
   {
     scanResponse.Items.forEach(item => {
-      records.push({
-        email: item.email.S,
-        captureDate: item.captureDate.S
+      var keys = Object.keys(item);
+      var record = {};
+      keys.forEach(key => {
+        record[key] = item[key].S;
       });
+      records.push(record);
     });
   }
 }
@@ -86,17 +88,19 @@ async function exportDataToS3(records)
 
     if (records !== undefined && records.length > 0)
     {
+      var headers = [];
+      var keys = Object.keys(records[0]);
+
+      keys.forEach(key => {
+        headers.push({
+          id: key,
+          title: key
+        });
+      });
+
       var writer = csvWriter({
         alwaysQuote: true,
-        header: 
-        [
-          {
-            id: 'email', title: 'Email'
-          },
-          {
-            id: 'captureDate', title: 'Capture date'
-          }
-        ]
+        header: headers
       });
 
       var csv = writer.getHeaderString();

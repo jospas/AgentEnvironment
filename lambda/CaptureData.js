@@ -78,6 +78,17 @@ async function storeAgentData(request)
       }
     };
 
+    var keys = Object.keys(request);
+
+    keys.forEach(key => {
+      if (key !== 'email')
+      {
+        params.Item[key] = {
+          S: request[key]
+        };
+      }
+    });
+
     await dynamoDB.putItem(params).promise();
   }
   catch (error)

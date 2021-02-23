@@ -1,8 +1,9 @@
 <div class="text-center py-4 bg-light">
   <div class="container">
-    <h1 class="display-4">Amazon Connect Agent Environment</h1>
+    <h1 class="p-2">Amazon Connect Agent Environment</h1>
 
-    <p class="lead">You have been send this link as your Amazon Connect administrator requires additional information about your working environment. Please answer the following questions and then submit your answers. This process should take less than 5 minutes to complete.</p>
+    <p class="lead" id="pageBanner" style="display:none;">You have been send this link as your Amazon Connect administrator requires additional information about your working environment. Please answer the following questions and then submit your answers. This process should take less than 5 minutes to complete.
+    Please ensure you are using the browser you will be use with Amazon Connect.</p>
   </div>
 </div>
 
@@ -13,16 +14,12 @@
   <div class="formPage" id="identityPage" style="display:none;">
     <form>
       <div class="form-group">
-        <label for="apiKey">API key</label>
-        <input type="text" class="form-control" id="apiKey" aria-describedby="apiKeyHelp" value="55ddb96e-6fff-11eb-9439-0242ac130002" placeholder="API key">
-        <small id="apiKeyHelp" class="form-text text-muted">Enter the API key provided by your adminstrator</small>
-      </div>
-      <div class="form-group">
         <label for="email">Work email</label>
-        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" value="jospas@amazon.com" placeholder="Email address">
+        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" value="" placeholder="Work email address">
         <small id="emailHelp" class="form-text text-muted">What is your work email address?</small>
       </div>
       <div class="text-center">
+        <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
         <button type="button" class="btn btn-primary" onClick="verifyIdentify();">Next <i class="fas fa-chevron-circle-right"></i></button>
       </div>
     </form>
@@ -37,9 +34,30 @@
           <option value="OFFICE">Working from the office</option>
           <option value="CALLCENTRE">Working from the call centre</option>
         </select>
-        <small id="apiKeyHelp" class="form-text text-muted">Where are you currently working from?</small>
+        <small id="locationHelp" class="form-text text-muted">Where are you currently working from?</small>
+      </div>
+      <div class="form-group">
+        <label for="returnDate">Return to office</label>
+        <input id="returnDate" 
+          aria-describedby="returnDateHelp"
+          required
+          placeholder="dd/mm/yyyy" 
+          autocomplete="off"
+          class="form-control">
+        <small id="returnDateHelp" class="form-text text-muted">Enter the date you are planning to return or the date you actually returned to the office. Leave blank if you are planning to continue working from home or never worked from home.</small>
+      </div>
+      <div class="form-group">
+        <label for="city">Your city</label>
+        <input type="text" class="form-control" id="city" aria-describedby="cityHelp" value="{{results.objects.geoIP.city}}">
+        <small id="cityHelp" class="form-text text-muted">Which city are you currently working in?</small>
+      </div>
+      <div class="form-group">
+        <label for="country">Your country</label>
+        <input type="text" class="form-control" id="country" aria-describedby="countryHelp" value="{{results.objects.geoIP.country}}">
+        <small id="countryHelp" class="form-text text-muted">Which country are you currently working in?</small>
       </div>
       <div class="text-center">
+        <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
         <button type="button" class="btn btn-primary" onClick="verifyLocation();">Next <i class="fas fa-chevron-circle-right"></i></button>
       </div>
     </form>
@@ -64,6 +82,7 @@
           <option value="CABLE">Cable internet</option>
           <option value="FIBRE">Fibre internet</option>
           <option value="MOBILE">Tethered mobile phone</option>
+          <option value="NBN">NBN internet</option>
           <option value="WIRELESS">Wireless internet</option>
           <option value="OFFICE">Office or Call Center network</option>
           <option value="OTHER">Other</option>
@@ -89,8 +108,18 @@
       </div>
       <div class="form-group">
         <label for="internetProvider">Internet provider</label>
-        <input type="text" class="form-control" id="internetProvider" aria-describedby="internetProviderHelp" value="{{results.geoIP.organization_name}}" placeholder="Your internet provider">  
+        <input type="text" class="form-control" id="internetProvider" aria-describedby="internetProviderHelp" value="{{results.objects.geoIP.organization_name}}" placeholder="Your internet provider">  
         <small id="internetProviderHelp" class="form-text text-muted">Who is your internet provider?</small>
+      </div>
+      <div class="form-group">
+        <label for="internetPlan">Internet plan</label>
+        <input type="text" class="form-control" id="internetPlan" aria-describedby="internetPlanHelp" value="" placeholder="Your internet plan">  
+        <small id="internetPlanHelp" class="form-text text-muted">What is your internet plan (leave blank for work provided internet)</small>
+      </div>
+      <div class="form-group">
+        <label for="internetCap">Monthly internet data</label>
+        <input type="text" class="form-control" id="internetCap" aria-describedby="internetCapHelp" value="" placeholder="Monthly data cap">  
+        <small id="internetCapHelp" class="form-text text-muted">Do you have a monthly data cap on your internet and if so how much is it?</small>
       </div>
       <div class="form-group">
         <label for="downloadSpeed">Download speed (Mbps)</label>
@@ -102,6 +131,7 @@
         <small id="speedTestHelp" class="form-text text-muted">Run the speed test to calculate the speed of your internet connection</small>
       </div>
       <div class="text-center">
+        <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
         <button type="button" class="btn btn-primary" onClick="runSpeedTest();">Run internet speed test</button>
         <button type="button" id="networkNextButton" class="btn btn-primary" onClick="verifyNetwork();" style="display:none;">Next <i class="fas fa-chevron-circle-right"></i></button>
       </div>
@@ -110,60 +140,201 @@
 
   <div class="formPage" id="computerPage" style="display:none;">
     <form>
-      
+      <div class="form-group">
+        <label for="deviceOwnership">Is this your computer?</label>
+        <select id="deviceOwnership" class="form-control" aria-describedby="deviceOwnershipHelp">
+          <option></option>
+          <option value="BYOD">This is my own computer</option>
+          <option value="WORK">This is a work computer</option>
+        </select>
+        <small id="deviceOwnershipHelp" class="form-text text-muted">Please advise if you are using a work computer or your own computer</small>
+      </div>
+      <div class="form-group">
+        <label for="computerModel">Computer make and model</label>
+        <input type="text" class="form-control" id="computerModel" aria-describedby="computerModelHelp" value="" placeholder="Computer make and model">
+        <small id="computerModelHelp" class="form-text text-muted">What make and model is your computer?</small>
+      </div>
+      <div class="form-group">
+        <label for="operatingSystem">Operating system</label>
+        <input type="text" class="form-control" id="operatingSystem" aria-describedby="operatingSystemHelp" value="{{results.objects.os.name}} {{results.objects.os.version}} {{results.objects.os.versionName}}" placeholder="Operating system">
+        <small id="operatingSystemHelp" class="form-text text-muted">What operating system are you using?</small>
+      </div>
+      <div class="form-group">
+        <label for="browserName">Browser name</label>
+        <input type="text" class="form-control" id="browserName" aria-describedby="browserNameHelp" value="{{results.objects.browser.name}}" placeholder="Browser name">
+        <small id="browserNameHelp" class="form-text text-muted">What is the name of browser are you using?</small>
+      </div>
+      <div class="form-group">
+        <label for="browserVersion">Browser version</label>
+        <input type="text" class="form-control" id="browserVersion" aria-describedby="browserVersionHelp" value="{{results.objects.browser.version}}" placeholder="Browser version">
+        <small id="browserVersionHelp" class="form-text text-muted">What version of the browser are you using?</small>
+      </div>
+      <div class="form-group">
+        <label for="dailyRestart">Daily restart</label>
+        <select id="dailyRestart" class="form-control" aria-describedby="dailyRestartHelp">
+          <option></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <small id="dailyRestartHelp" class="form-text text-muted">Do you restart your computer every day?</small>
+      </div>
       <div class="text-center">
+        <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
         <button type="button" class="btn btn-primary" onClick="verifyComputer();">Next <i class="fas fa-chevron-circle-right"></i></button>
       </div>
     </form>
   </div>
 
+  <div class="formPage" id="audioPage" style="display:none;">
+    <form>
+      <div class="form-group">
+        <label for="headphonesConnection">Headphones connection</label>
+        <select id="headphonesConnection" class="form-control" aria-describedby="headphonesConnectionHelp">
+          <option></option>
+          <option value="WIRED">Wired using an audio cable</option>
+          <option value="WIRED_USB">Wired using USB</option>
+          <option value="BLUETOOTH">Connected via BlueTooth</option>
+          <option value="NONE">I don't have headphones</option>
+        </select>
+        <small id="headphonesConnectionHelp" class="form-text text-muted">Tell me how you connect your headphones and microphone</small>
+      </div>
+      <div class="form-group">
+        <label for="headphonesMakeModel">Headphones make and model</label>
+        <input type="text" class="form-control" id="headphonesMakeModel" aria-describedby="headphonesMakeModelHelp" value="" placeholder="Headphones make and model">
+        <small id="headphonesMakeModelHelp" class="form-text text-muted">What make and model are your headphones?</small>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
+        <button type="button" class="btn btn-primary" onClick="verifyAudio();">Next <i class="fas fa-chevron-circle-right"></i></button>
+      </div>
+    </form>
+  </div>
+
+  <div class="formPage text-center" id="submitPage" style="display:none;">
+    <h3 class="py-3">
+      Thanks, you are now ready to submit your results!
+    </h3>
+    <p class="pb-3">
+        Click the submit results button below, wait for the success message and then you may close this window.
+    </p>
+    
+    <div class="text-center">
+      <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
+      <button type="button" class="btn btn-primary" onClick="submitResults();">Submit results</button>
+    </div>
+
+  </div>
+
+  <div class="formPage text-center" id="donePage" style="display:none;">
+    <h3 class="pt-3">
+      You are all done, please close this window!
+    </h3>
+  </div>
+
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="messageDialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dialogTitle"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-2 text-center pt-1 pb-3" id="dialogIcon"><i class="fas fa-exclamation-circle fa-danger fa-3x"></i></div>
+          <div class="col-10">
+            <p id="dialogMessage" class="pt-4"></p>
+          </dsiv>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">&nbsp; &nbsp; &nbsp;OK &nbsp; &nbsp; &nbsp;</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
+
+$.fn.datepicker.defaults.autoclose = true;
+
+  $('#returnDate').datepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+      orientation: 'below auto',
+      todayHighlight: true
+  });
+
+  /**
+   * Cancels out of the wizard resetting everything
+   */
+  async function cancel(e)
+  {
+    clearStorage('results');
+    clearStorage('stages');
+
+    window.location.reload();
+    return false;
+  }
+
+  /**
+   * Verifies the identify details
+   */
   async function verifyIdentify(e)
   {
     var results = await getResults();
-    delete results.apiKey;
     delete results.email;
 
-    var apiKey = $('#apiKey').val();
     var email = $('#email').val();
 
-    if (apiKey !== '' && email !== '')
+    if (email !== '')
     {
-      var loginResults = await checkLogin(apiKey);
+      var loginResults = await checkLogin(results.apiKey);
 
       if (loginResults.success)
       {
-        results.apiKey = apiKey;
         results.email = email;
-        results.loginResults = loginResults;
+        results.objects.loginResults = loginResults;
         saveResults(results);
         pageSuccess('identity');
       }
       else
       {
         pageError('identity');
-        alert('Your API key is not valid, please check with your supervisor');
+        showMessageDialog('Invalid API Key', 'Your API key is not valid, please check with your supervisor');
       }
     }
     else
     {
       pageError('identity');
-      alert('Please complete all identity fields');
+      showMessageDialog('Complete required fields', 
+        'Please complete all identity fields', 'warning');
     }
   }
 
+  /**
+   * Verifies the location detail
+   */
   async function verifyLocation(e)
   {
     var results = await getResults();
     delete results.location;
 
     var location = $('#location').val();
+    var returnDate = $('#returnDate').val();
 
-    if (location !== '')
+    var city = $('#city').val();
+    var country = $('#country').val();
+
+    if (location !== '' && city !== '' && country !== '')
     {
       results.location = location;
+      results.returnDate = returnDate;
+      results.city = city;
+      results.country = country;
 
       saveResults(results);
       pageSuccess('location');
@@ -171,44 +342,66 @@
     else
     {
       pageError('location');
-      alert('Please complete all location fields');
+      showMessageDialog('Complete required fields', 
+        'Please complete all location fields', 'warning');
     }
   } 
 
+  /**
+   * Verifies network details
+   */
   async function verifyNetwork(e)
   {
     var results = await getResults();
+
     delete results.networkConnection;
     delete results.internetConnection;
     delete results.internetUserCount;
     delete results.internetUserType;
+    delete results.internetProvider;
+    delete results.internetPlan;
+    delete results.internetCap;
+
+    delete results.downloadSpeed;
+    delete results.uploadSpeed;
+    delete results.latency;
 
     var networkConnection = $('#networkConnection').val();
     var internetConnection = $('#internetConnection').val();
     var internetUserCount = $('#internetUserCount').val();
     var internetUserType = $('#internetUserType').val();
+    var internetProvider = $('#internetProvider').val();
+    var internetPlan = $('#internetPlan').val();
+    var internetCap = $('#internetCap').val();
 
     var downloadSpeed = $('#downloadSpeed').val();
     var uploadSpeed = $('#uploadSpeed').val();
+    var latency = $('#latency').val();
 
     var isNumber = /^\d+$/;
 
     if (downloadSpeed === '' || uploadSpeed === '' || latency === '')
     {
       pageError('network');
-      alert('Please run the network speed tests');
+      showMessageDialog('No speed data', 
+        'Please run the network speed tests', 'warning');
       return;
     }
 
     if (networkConnection !== '' && 
-      internetConnection !== '' && 
-      internetUserCount !== '' &&
-      internetUserType !== '')
+        internetConnection !== '' && 
+        internetUserCount !== '' &&
+        internetUserType !== '' && 
+        internetProvider !== '' &&
+        internetPlan !== '' &&
+        internetCap !== '')
     {
       if (!isNumber.test(internetUserCount))
       {
         pageError('network');
-        alert('Please provide a whole number for the number of shared internet users');
+        showMessageDialog('Invalid user count', 
+          'Please provide a positive whole number for the number of shared internet users', 
+          'warning');
         return;
       }
 
@@ -216,6 +409,13 @@
       results.internetConnection = internetConnection;
       results.internetUserCount = internetUserCount;
       results.internetUserType = internetUserType;
+      results.internetProvider = internetProvider;
+      results.internetPlan = internetPlan;
+      results.internetCap = internetCap;
+
+      results.downloadSpeed = downloadSpeed;
+      results.uploadSpeed = uploadSpeed;
+      results.latency = latency;
 
       saveResults(results);
       pageSuccess('network');
@@ -223,34 +423,109 @@
     else
     {
       pageError('network');
-      alert('Please complete all network fields');
+      showMessageDialog('Complete required fields', 
+        'Please complete all network fields', 'warning');
     }
   }  
 
-  async function verifyComputer()
+  /**
+   * Verifies computer details
+   */
+  async function verifyComputer(e)
   {
-    var parser = new UAParser();
     var results = await getResults();
-    saveResults(results);
-    pageSuccess('computer');
+
+    delete results.deviceOwnership;
+    delete results.computerModel;
+    delete results.operatingSystem;
+    delete results.browserName;
+    delete results.browserVersion;
+    delete results.dailyRestart;
+
+    var deviceOwnership = $('#deviceOwnership').val();
+    var computerModel = $('#computerModel').val();
+    var operatingSystem = $('#operatingSystem').val();
+    var browserName = $('#browserName').val();
+    var browserVersion = $('#browserVersion').val();
+    var dailyRestart = $('#dailyRestart').val();
+
+    if (deviceOwnership !== '' && 
+        computerModel !== '' && 
+        operatingSystem !== '' &&
+        browserName !== '' && 
+        browserVersion !== '' &&
+        dailyRestart !== '')
+    {
+      results.deviceOwnership = deviceOwnership;
+      results.computerModel = computerModel;
+      results.operatingSystem = operatingSystem;
+      results.browserName = browserName;
+      results.browserVersion = browserVersion;
+      results.dailyRestart = dailyRestart;
+
+      saveResults(results);
+      pageSuccess('computer');
+    }
+    else
+    {
+      pageError('computer');
+      showMessageDialog('Complete required fields', 
+        'Please complete all computer fields', 'warning');
+    }
+  } 
+
+  /**
+   * Verifies audio details
+   */
+  async function verifyAudio(e)
+  {
+    var results = await getResults();
+
+    delete results.headphonesConnection;
+    delete results.headphonesMakeModel;
+
+    var headphonesConnection = $('#headphonesConnection').val();
+    var headphonesMakeModel = $('#headphonesMakeModel').val();
+
+    if (headphonesConnection !== '' && 
+        headphonesMakeModel !== '')
+    {
+      results.headphonesConnection = headphonesConnection;
+      results.headphonesMakeModel = headphonesMakeModel;
+
+      saveResults(results);
+      pageSuccess('audio');
+    }
+    else
+    {
+      pageError('audio');
+      showMessageDialog('Complete required fields', 
+        'Please complete all audio fields', 
+        'warning');
+    }
   }
 
-  function changePage()
+  /**
+   * Submit the final results
+   */
+  async function submitResults()
   {
-    $('.formPage').hide();
-
-    var stages = getStages();
-    var stageNames = Object.keys(stages);
-
-    stageNames.forEach(stageName =>
+    try
     {
-      var stage = stages[stageName];
-
-      if (stage.current)
-      {
-        $('#' + stageName + 'Page').show();
-      }
-    });
+      var results = await getResults();
+      await sendResults(results);
+      pageSuccess('submit');
+      showMessageDialog('Submission complete!', 
+        'Your submission is complete, you may now close this browser tab.', 'success');
+    }
+    catch (error)
+    {
+      console.log('[ERROR] failed to submit results', error);
+      pageError('submit');
+      showMessageDialog('Submission error detected', 
+        'Failed to submit your results, please try again. If this problem persists please alert your supervisor', 
+        'warning');
+    }
   }
 
   /**
@@ -261,7 +536,7 @@
     try
     {
       var results = await getResults();
-      console.log('Refretched signed upload url');
+      console.log('Refetched signed upload url');
 
       results.loginResult = await checkLogin(results.apiKey);
 
@@ -282,13 +557,12 @@
       $('#uploadSpeed').val('');
 
       size = 10;
-      seconds = await timeUpload(size, results.loginResults.uploadUrl);
+      seconds = await timeUpload(size, results.objects.loginResults.uploadUrl);
       megabits = size * 8;
       megaBitsPerSec = megabits / seconds;
       $('#uploadSpeed').val(megaBitsPerSec.toFixed(2));
       $('#latency').attr('placeholder', 'Calculating latency...');
 
-      iterations = 20;
       var latency = await timeLatency();
       $('#latency').val(latency);
 
@@ -299,7 +573,7 @@
       console.log('[ERROR] Speed tests failed to run', error);
       pageError('network');
       renderStages();
-      alert('Speed tests failed to run, please check your network connectivity');
+      showMessageDialog('Speed tests failed', 'Speed tests failed to run, please check your network connectivity');
       return;
     }
   }
@@ -350,6 +624,26 @@
     console.log('Latency: ' + JSON.stringify(lastResource, null, 2));
     return Math.floor(lastResource.responseStart - lastResource.requestStart);
   }  
+
+  function showMessageDialog(title, message, type = 'warning')
+  {
+    $('#dialogTitle').html(title);
+    $('#dialogMessage').html(message);
+    $('#messageDialog').modal();
+
+    if (type === 'success')
+    {
+      $('#dialogIcon').html('<i class="fas fa-check-circle text-success fa-4x"></i>');
+    }
+    else if (type === 'info')
+    {
+      $('#dialogIcon').html('<i class="fas fa-info-circle text-success fa-4x"></i>');
+    }
+    else if (type === 'warning')
+    {
+      $('#dialogIcon').html('<i class="fas fa-exclamation-triangle text-warning fa-4x"></i>');
+    }
+  }
 
   renderStages();
   changePage();
