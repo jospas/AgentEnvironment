@@ -634,3 +634,147 @@ function changePage()
 }
 
 
+function highlightStars(id, rating)
+{
+  for (var i = 1; i <= rating; i++)
+  {
+    var offId = '#' + id + 'Off' + i;
+    var onId = '#' + id + 'On' + i;
+    $(offId).hide();
+    $(onId).show();
+  }
+}
+
+function toolingNPS(rating)
+{
+  $('.toolingNPSOn').hide();
+  $('.toolingNPSOff').show();
+  highlightStars('toolingNPS', rating);
+  $('#toolingNPS').val(rating);
+}
+
+function connectNPS(rating)
+{
+  $('.connectNPSOn').hide();
+  $('.connectNPSOff').show();
+  highlightStars('connectNPS', rating);
+  $('#connectNPS').val(rating);
+}
+
+/**
+ * Runs an internet speed test by uploading and downloading files
+ */
+async function runSpeedTest(e)
+{
+  try
+  {
+    var results = await getResults();
+    console.log('Refetched signed upload url');
+
+    results.loginResult = await checkLogin(results.apiKey);
+
+    $('#downloadSpeed').attr('placeholder', 'Calculating download speed...');
+    $('#downloadSpeed').val('');
+    $('#uploadSpeed').attr('placeholder', 'Pending...');
+    $('#uploadSpeed').val('');
+    $('#latency').attr('placeholder', 'Pending...');
+    $('#latency').val(''); 
+
+    var size = 50;
+    var seconds = await timeDownload(size);
+    var megabits = size * 8;
+    var megaBitsPerSec = megabits / seconds;
+
+    $('#downloadSpeed').val(megaBitsPerSec.toFixed(2));
+    $('#uploadSpeed').attr('placeholder', 'Calculating upload speed...');
+    $('#uploadSpeed').val('');
+
+    size = 10;
+    seconds = await timeUpload(size, results.objects.loginResults.uploadUrl);
+    megabits = size * 8;
+    megaBitsPerSec = megabits / seconds;
+    $('#uploadSpeed').val(megaBitsPerSec.toFixed(2));
+    $('#latency').attr('placeholder', 'Calculating latency...');
+
+    var latency = await timeLatency();
+    $('#latency').val(latency);
+
+    $('#networkNextButton').show();
+  }
+  catch (error)
+  {
+    console.log('[ERROR] Speed tests failed to run', error);
+    pageError('network');
+    renderStages();
+    showMessageDialog('Speed tests failed', 'Speed tests failed to run, please check your network connectivity');
+    return;
+  }
+}
+
+async function timeDownload(size, iterations)
+{
+  var data = await axios.get('test_files/' + size + 'mb.test');
+  var resources = performance.getEntriesByType('resource');
+  var lastResource = resources[resources.length - 1];
+  console.log('Download: ' + JSON.stringify(lastResource, null, 2));
+  return (lastResource.responseEnd - lastResource.responseStart) / 1000;
+}
+
+/**
+ * Upload a file to S3
+ */
+async function timeUpload(size, url)
+{
+  var payload = [];
+  var bytes = size * 1024 * 1024;
+  for (var i = 0; i < bytes; i++)
+  {
+    payload.push(0);
+  }
+
+  var options = {
+    headers: {
+      ContentType: 'text/plain'
+    }
+  };
+
+  var actualUrl = url.substring(siteConfig.origin.length);
+  var data = await axios.put(actualUrl, payload, options);
+  var resources = performance.getEntriesByType('resource');
+  var lastResource = resources[resources.length - 1];
+  console.log('Upload: ' + JSON.stringify(lastResource, null, 2));
+  return (lastResource.responseStart - lastResource.requestStart) / 1000;
+}
+
+/**
+ * Download a small image from S3 and time it using performance timers
+ */
+async function timeLatency()
+{
+  var data = await axios.get('img/1x1.png?t=' + Math.floor(Math.random() * 100000));
+  var resources = performance.getEntriesByType('resource');
+  var lastResource = resources[resources.length - 1];
+  console.log('Latency: ' + JSON.stringify(lastResource, null, 2));
+  return Math.floor(lastResource.responseStart - lastResource.requestStart);
+}  
+
+function showMessageDialog(title, message, type = 'warning')
+{
+  $('#dialogTitle').html(title);
+  $('#dialogMessage').html(message);
+  $('#messageDialog').modal();
+
+  if (type === 'success')
+  {
+    $('#dialogIcon').html('<i class="fas fa-check-circle text-success fa-3x"></i>');
+  }
+  else if (type === 'info')
+  {
+    $('#dialogIcon').html('<i class="fas fa-info-circle text-success fa-3x"></i>');
+  }
+  else if (type === 'warning')
+  {
+    $('#dialogIcon').html('<i class="fas fa-exclamation-triangle text-warning fa-3x"></i>');
+  }
+}
+

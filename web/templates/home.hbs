@@ -220,10 +220,54 @@
   </div>
 
   <div class="formPage text-center" id="submitPage" style="display:none;">
-    <h3 class="py-3">
-      Thanks, you are now ready to submit your results!
-    </h3>
-    <p class="pb-3">
+
+    <form>
+      <div class="form-group">
+        <input type="hidden" id="toolingNPS" value="">
+        <div class="text-center pt-3">
+          
+          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff1" onClick="toolingNPS(1);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn1" onClick="toolingNPS(1);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff2" onClick="toolingNPS(2);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn2" onClick="toolingNPS(2);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff3" onClick="toolingNPS(3);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn3" onClick="toolingNPS(3);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff4" onClick="toolingNPS(4);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn4" onClick="toolingNPS(4);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff5" onClick="toolingNPS(5);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn5" onClick="toolingNPS(5);" style="display: none;"></i>
+        </div>
+        <label>How would you rate your overall satisfaction with this survey?</label>
+      </div>
+
+      <div class="form-group">
+        <input type="hidden" id="connectNPS" value="">
+        <div class="text-center pt-3">
+
+          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff1" onClick="connectNPS(1);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn1" onClick="connectNPS(1);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff2" onClick="connectNPS(2);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn2" onClick="connectNPS(2);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff3" onClick="connectNPS(3);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn3" onClick="connectNPS(3);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff4" onClick="connectNPS(4);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn4" onClick="connectNPS(4);" style="display: none;"></i>
+
+          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff5" onClick="connectNPS(5);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn5" onClick="connectNPS(5);" style="display: none;"></i>
+        </div>
+        <label>How would you rate your overall satisfaction with Amazon Connect?</label>
+      </div>
+    </form>
+
+    <p class="py-3">
         Click the submit results button below, wait for the success message and then you may close this window.
     </p>
     
@@ -524,11 +568,28 @@ $.fn.datepicker.defaults.autoclose = true;
   {
     try
     {
-      var results = await getResults();
-      await sendResults(results);
-      pageSuccess('submit');
-      showMessageDialog('Submission complete!', 
-        'Your submission is complete, you may now close this browser tab.', 'success');
+      var toolingNPS = $('#toolingNPS').val();
+      var connectNPS = $('#connectNPS').val();
+
+      if (toolingNPS !== '' && connectNPS !== '')
+      {
+        var results = await getResults();
+        results.toolingNPS = toolingNPS;
+        results.connectNPS = connectNPS;
+        saveResults(results);
+
+        await sendResults(results);
+        pageSuccess('submit');
+        showMessageDialog('Submission complete!', 
+          'Your submission is complete, you may now close this browser tab.', 'success');
+      }
+      else
+      {
+        pageError('submit');
+        showMessageDialog('Rating required', 
+          'Please rate your satisfaction between 1 and 5', 
+          'warning');
+      }
     }
     catch (error)
     {
@@ -537,123 +598,6 @@ $.fn.datepicker.defaults.autoclose = true;
       showMessageDialog('Submission error detected', 
         'Failed to submit your results, please try again. If this problem persists please alert your supervisor', 
         'warning');
-    }
-  }
-
-  /**
-   * Runs an internet speed test by uploading and downloading files
-   */
-  async function runSpeedTest(e)
-  {
-    try
-    {
-      var results = await getResults();
-      console.log('Refetched signed upload url');
-
-      results.loginResult = await checkLogin(results.apiKey);
-
-      $('#downloadSpeed').attr('placeholder', 'Calculating download speed...');
-      $('#downloadSpeed').val('');
-      $('#uploadSpeed').attr('placeholder', 'Pending...');
-      $('#uploadSpeed').val('');
-      $('#latency').attr('placeholder', 'Pending...');
-      $('#latency').val(''); 
-
-      var size = 50;
-      var seconds = await timeDownload(size);
-      var megabits = size * 8;
-      var megaBitsPerSec = megabits / seconds;
-
-      $('#downloadSpeed').val(megaBitsPerSec.toFixed(2));
-      $('#uploadSpeed').attr('placeholder', 'Calculating upload speed...');
-      $('#uploadSpeed').val('');
-
-      size = 10;
-      seconds = await timeUpload(size, results.objects.loginResults.uploadUrl);
-      megabits = size * 8;
-      megaBitsPerSec = megabits / seconds;
-      $('#uploadSpeed').val(megaBitsPerSec.toFixed(2));
-      $('#latency').attr('placeholder', 'Calculating latency...');
-
-      var latency = await timeLatency();
-      $('#latency').val(latency);
-
-      $('#networkNextButton').show();
-    }
-    catch (error)
-    {
-      console.log('[ERROR] Speed tests failed to run', error);
-      pageError('network');
-      renderStages();
-      showMessageDialog('Speed tests failed', 'Speed tests failed to run, please check your network connectivity');
-      return;
-    }
-  }
-
-  async function timeDownload(size, iterations)
-  {
-    var data = await axios.get('test_files/' + size + 'mb.test');
-    var resources = performance.getEntriesByType('resource');
-    var lastResource = resources[resources.length - 1];
-    console.log('Download: ' + JSON.stringify(lastResource, null, 2));
-    return (lastResource.responseEnd - lastResource.responseStart) / 1000;
-  }
-
-  /**
-   * Upload a file to S3
-   */
-  async function timeUpload(size, url)
-  {
-    var payload = [];
-    var bytes = size * 1024 * 1024;
-    for (var i = 0; i < bytes; i++)
-    {
-      payload.push(0);
-    }
-
-    var options = {
-      headers: {
-        ContentType: 'text/plain'
-      }
-    };
-
-    var actualUrl = url.substring(siteConfig.origin.length);
-    var data = await axios.put(actualUrl, payload, options);
-    var resources = performance.getEntriesByType('resource');
-    var lastResource = resources[resources.length - 1];
-    console.log('Upload: ' + JSON.stringify(lastResource, null, 2));
-    return (lastResource.responseStart - lastResource.requestStart) / 1000;
-  }
-
-  /**
-   * Download a small image from S3 and time it using performance timers
-   */
-  async function timeLatency()
-  {
-    var data = await axios.get('img/1x1.png?t=' + Math.floor(Math.random() * 100000));
-    var resources = performance.getEntriesByType('resource');
-    var lastResource = resources[resources.length - 1];
-    console.log('Latency: ' + JSON.stringify(lastResource, null, 2));
-    return Math.floor(lastResource.responseStart - lastResource.requestStart);
-  }  
-
-  function showMessageDialog(title, message, type = 'warning')
-  {
-    $('#dialogTitle').html(title);
-    $('#dialogMessage').html(message);
-    $('#messageDialog').modal();
-
-    if (type === 'success')
-    {
-      $('#dialogIcon').html('<i class="fas fa-check-circle text-success fa-3x"></i>');
-    }
-    else if (type === 'info')
-    {
-      $('#dialogIcon').html('<i class="fas fa-info-circle text-success fa-3x"></i>');
-    }
-    else if (type === 'warning')
-    {
-      $('#dialogIcon').html('<i class="fas fa-exclamation-triangle text-warning fa-3x"></i>');
     }
   }
 
