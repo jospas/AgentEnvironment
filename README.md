@@ -51,7 +51,7 @@ To deploy using [Serverless](https://www.serverless.com/) (creates and deploys a
 
 ### Deploy the web application
 
-You may then configure and deploy the static website to S3. Edit the following file and enter your api end point:
+You may then configure and deploy the static website to S3. Edit the following file and enter your api end point and origin:
   
 	web/config/site_config.json	
 
@@ -59,7 +59,7 @@ Replace the variables below:
 
 	{
 	  "version": "1.0.0",
-	  "api": "https://<API Gateway id>.execute-api.<region>.amazonaws.com/dev/agentenvironment",
+	  "api": "https://<apigwid>.execute-api.<region>.amazonaws.com/dev/agentenvironment",
 	  "origin": "https://<stage>-realtime-dashboard-site-<region>-<account number>.s3.<region>.amazonaws.com"
 	}
 
