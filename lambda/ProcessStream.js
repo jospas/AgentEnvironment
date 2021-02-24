@@ -47,6 +47,15 @@ async function loadDataFromDynamo()
       extractRecords(records, scanResponse);      
     }
 
+    // Sort records ascending by capture date then email
+    records.sort(function(a,b) {
+      if (a.captureDate < b.captureDate) return -1;
+      if (a.captureDate > b.captureDate) return 1;
+      if (a.email < b.email) return -1;
+      if (a.email > b.email) return 1;
+      return 0;
+    });
+
     return records;
   }
   catch (error)
@@ -106,20 +115,22 @@ async function exportDataToS3(records)
       var headers = [];
       var keys = getUniqueKeys(records);
 
-      // Put email and capture date at the lfront
+      // Put capture date and email at the front
+      headers.push({
+        id: 'captureDate',
+        title: 'captureDate'
+      });
       headers.push({
         id: 'email',
         title: 'email'
       });
 
-      headers.push({
-        id: 'captureDate',
-        title: 'captureDate'
-      });
-
-      // Add the other headers skipping email and capture date
+      // Add the other headers skipping email, capture date, userAgent and notes
       keys.forEach(key => {
-        if (key !== 'email' && key !== 'captureDate')
+        if (key !== 'email' && 
+            key !== 'captureDate' && 
+            key !== 'userAgent' && 
+            key !== 'notes')
         {
           headers.push({
             id: key,
@@ -127,6 +138,16 @@ async function exportDataToS3(records)
           });
         }
       });
+
+      // Put user agent and notes at the end
+      headers.push({
+        id: 'userAgent',
+        title: 'userAgent'
+      });  
+      headers.push({
+        id: 'notes',
+        title: 'notes'
+      });      
 
       var writer = csvWriter({
         alwaysQuote: true,

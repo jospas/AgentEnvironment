@@ -3,7 +3,8 @@
     <h1 class="p-2">Amazon Connect Agent Environment</h1>
 
     <p class="lead" id="pageBanner" style="display:none;">You have been send this link as your Amazon Connect administrator requires additional information about your working environment. Please answer the following questions and then submit your answers. This process should take less than 5 minutes to complete.
-    Please ensure you are using the browser you will be use with Amazon Connect.</p>
+    Please ensure you are using the browser you will be use with Amazon Connect. This is version 1.0.3
+    </p>
   </div>
 </div>
 
@@ -219,55 +220,59 @@
     </form>
   </div>
 
-  <div class="formPage text-center" id="submitPage" style="display:none;">
-
+  <div class="formPage" id="submitPage" style="display:none;">
     <form>
-      <div class="form-group">
-        <input type="hidden" id="toolingNPS" value="">
-        <div class="text-center pt-3">
-          
-          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff1" onClick="toolingNPS(1);"></i>
-          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn1" onClick="toolingNPS(1);" style="display: none;"></i>
+      <div class="form-group pt-3">
+        <input type="hidden" id="toolingCSAT" value="">
+        <label>Survey Satisfaction</label>
+        <div>
+          <i class="far fa-star fa-3x muted-star toolingCSATOff" id="toolingCSATOff1" onClick="toolingCSAT(1);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingCSATOn" id="toolingCSATOn1" onClick="toolingCSAT(1);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff2" onClick="toolingNPS(2);"></i>
-          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn2" onClick="toolingNPS(2);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star toolingCSATOff" id="toolingCSATOff2" onClick="toolingCSAT(2);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingCSATOn" id="toolingCSATOn2" onClick="toolingCSAT(2);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff3" onClick="toolingNPS(3);"></i>
-          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn3" onClick="toolingNPS(3);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star toolingCSATOff" id="toolingCSATOff3" onClick="toolingCSAT(3);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingCSATOn" id="toolingCSATOn3" onClick="toolingCSAT(3);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff4" onClick="toolingNPS(4);"></i>
-          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn4" onClick="toolingNPS(4);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star toolingCSATOff" id="toolingCSATOff4" onClick="toolingCSAT(4);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingCSATOn" id="toolingCSATOn4" onClick="toolingCSAT(4);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star toolingNPSOff" id="toolingNPSOff5" onClick="toolingNPS(5);"></i>
-          <i class="fas fa-star fa-3x yellow-star toolingNPSOn" id="toolingNPSOn5" onClick="toolingNPS(5);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star toolingCSATOff" id="toolingCSATOff5" onClick="toolingCSAT(5);"></i>
+          <i class="fas fa-star fa-3x yellow-star toolingCSATOn" id="toolingCSATOn5" onClick="toolingCSAT(5);" style="display: none;"></i>
         </div>
-        <label>How would you rate your overall satisfaction with this survey?</label>
+        <small class="form-text text-muted">Please rate your satisfaction with this survey</small>
       </div>
 
-      <div class="form-group">
-        <input type="hidden" id="connectNPS" value="">
-        <div class="text-center pt-3">
+      <div class="form-group pt-3">
+        <input type="hidden" id="connectCSAT" value="">
+        <label>Amazon Connect Satisfaction</label>
+        <div>
+          <i class="far fa-star fa-3x muted-star connectCSATOff" id="connectCSATOff1" onClick="connectCSAT(1);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectCSATOn" id="connectCSATOn1" onClick="connectCSAT(1);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff1" onClick="connectNPS(1);"></i>
-          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn1" onClick="connectNPS(1);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star connectCSATOff" id="connectCSATOff2" onClick="connectCSAT(2);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectCSATOn" id="connectCSATOn2" onClick="connectCSAT(2);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff2" onClick="connectNPS(2);"></i>
-          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn2" onClick="connectNPS(2);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star connectCSATOff" id="connectCSATOff3" onClick="connectCSAT(3);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectCSATOn" id="connectCSATOn3" onClick="connectCSAT(3);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff3" onClick="connectNPS(3);"></i>
-          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn3" onClick="connectNPS(3);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star connectCSATOff" id="connectCSATOff4" onClick="connectCSAT(4);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectCSATOn" id="connectCSATOn4" onClick="connectCSAT(4);" style="display: none;"></i>
 
-          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff4" onClick="connectNPS(4);"></i>
-          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn4" onClick="connectNPS(4);" style="display: none;"></i>
-
-          <i class="far fa-star fa-3x muted-star connectNPSOff" id="connectNPSOff5" onClick="connectNPS(5);"></i>
-          <i class="fas fa-star fa-3x yellow-star connectNPSOn" id="connectNPSOn5" onClick="connectNPS(5);" style="display: none;"></i>
+          <i class="far fa-star fa-3x muted-star connectCSATOff" id="connectCSATOff5" onClick="connectCSAT(5);"></i>
+          <i class="fas fa-star fa-3x yellow-star connectCSATOn" id="connectCSATOn5" onClick="connectCSAT(5);" style="display: none;"></i>
         </div>
-        <label>How would you rate your overall satisfaction with Amazon Connect?</label>
+        <small class="form-text text-muted">Please rate your overall satisfaction with Amazon Connect</small>
+      </div>
+
+      <div class="form-group pt-3">
+        <textarea class="form-control" id="notes" aria-describedby="notesHelp" placeholder="Other information" rows="4"></textarea>
+        <small id="notesHelp" class="form-text text-muted">Are you currently experiencing an issue or do you have additional information to share? (optional)</small>
       </div>
     </form>
 
-    <p class="py-3">
+    <p class="py-3 text-center">
         Click the submit results button below, wait for the success message and then you may close this window.
     </p>
     
@@ -568,14 +573,16 @@ $.fn.datepicker.defaults.autoclose = true;
   {
     try
     {
-      var toolingNPS = $('#toolingNPS').val();
-      var connectNPS = $('#connectNPS').val();
+      var toolingCSAT = $('#toolingCSAT').val();
+      var connectCSAT = $('#connectCSAT').val();
+      var notes = $('#notes').val();
 
-      if (toolingNPS !== '' && connectNPS !== '')
+      if (toolingCSAT !== '' && connectCSAT !== '')
       {
         var results = await getResults();
-        results.toolingNPS = toolingNPS;
-        results.connectNPS = connectNPS;
+        results.csatSurvey = toolingCSAT;
+        results.csatConnect = connectCSAT;
+        results.notes = notes;
         saveResults(results);
 
         await sendResults(results);

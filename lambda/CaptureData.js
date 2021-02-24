@@ -81,7 +81,7 @@ async function storeAgentData(request)
     var keys = Object.keys(request);
 
     keys.forEach(key => {
-      if (key !== 'email')
+      if (key !== 'email' && key !== 'captureDate')
       {
         params.Item[key] = {
           S: request[key]

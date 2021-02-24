@@ -531,7 +531,8 @@ async function sendResults(results)
     keys.forEach(key => {
       if (key !== 'objects' && key !== 'apiKey')
       {
-        body[key] = results[key];
+        // Clean each field to remove anything that might trip up a CSV parser later
+        body[key] = results[key].replace(/[\r\n\s",]+/g, ' ');
       }
     });
 
@@ -645,20 +646,20 @@ function highlightStars(id, rating)
   }
 }
 
-function toolingNPS(rating)
+function toolingCSAT(rating)
 {
-  $('.toolingNPSOn').hide();
-  $('.toolingNPSOff').show();
-  highlightStars('toolingNPS', rating);
-  $('#toolingNPS').val(rating);
+  $('.toolingCSATOn').hide();
+  $('.toolingCSATOff').show();
+  highlightStars('toolingCSAT', rating);
+  $('#toolingCSAT').val(rating);
 }
 
-function connectNPS(rating)
+function connectCSAT(rating)
 {
-  $('.connectNPSOn').hide();
-  $('.connectNPSOff').show();
-  highlightStars('connectNPS', rating);
-  $('#connectNPS').val(rating);
+  $('.connectCSATOn').hide();
+  $('.connectCSATOff').show();
+  highlightStars('connectCSAT', rating);
+  $('#connectCSAT').val(rating);
 }
 
 /**
@@ -716,7 +717,6 @@ async function timeDownload(size, iterations)
   var data = await axios.get('test_files/' + size + 'mb.test');
   var resources = performance.getEntriesByType('resource');
   var lastResource = resources[resources.length - 1];
-  console.log('Download: ' + JSON.stringify(lastResource, null, 2));
   return (lastResource.responseEnd - lastResource.responseStart) / 1000;
 }
 
@@ -742,7 +742,6 @@ async function timeUpload(size, url)
   var data = await axios.put(actualUrl, payload, options);
   var resources = performance.getEntriesByType('resource');
   var lastResource = resources[resources.length - 1];
-  console.log('Upload: ' + JSON.stringify(lastResource, null, 2));
   return (lastResource.responseStart - lastResource.requestStart) / 1000;
 }
 
@@ -754,7 +753,6 @@ async function timeLatency()
   var data = await axios.get('img/1x1.png?t=' + Math.floor(Math.random() * 100000));
   var resources = performance.getEntriesByType('resource');
   var lastResource = resources[resources.length - 1];
-  console.log('Latency: ' + JSON.stringify(lastResource, null, 2));
   return Math.floor(lastResource.responseStart - lastResource.requestStart);
 }  
 
