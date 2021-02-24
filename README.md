@@ -2,11 +2,17 @@
 
 This project aims to provide a simple web interface to capture information about Amazon Connect Agents, including hardware and network configurations.
 
-It deploys a single page web applcation that can be shared with Amazon Connect Agents to capture important environment information and saves this data to DynamoDB and to Amazon S3 as CSV and JSON for investigation and processing.
+It deploys a single page web application that can be shared with Amazon Connect Agents to capture important environment information and saves this data to DynamoDB and to Amazon S3 as CSV and JSON for investigation and processing.
 
 ## Architecture
 
-	TODO architecture diagram
+![Architecture diagram](docs/architecture.png)
+
+The system uses Amazon S3 to serve a Singgle Page Web application to users. Users fill in survey fields and run speed tests against Amazon S3 in the deployed region.
+
+Results are then submitted via API Gateway and stored in Amazon DynamoDB via a Lambda function.
+
+Changes to the DynamoDB table trigger a DynamoDB Stream which calls a Lambda function to export all data to CSV into Amazon S3 for the administrator to collect.
 
 ## Building
 
@@ -58,7 +64,91 @@ Then deploy the web application to your site bucket:
 	   --acl public-read \
 	   . s3://<stage>-agent-environment-site-<region>-<accountNumber>
 
-## Troubleshooting
+### Create sample data files
+
+The system uses test file in S3 to calculate network performance, create these locally on mac using:
+
+	mkdir -p ./data/test_files/
+	mkfile -n 1m ./data/test_files/1mb.test
+	mkfile -n 5m ./data/test_files/5mb.test
+	mkfile -n 10m ./data/test_files/10mb.test
+	mkfile -n 20m ./data/test_files/20mb.test
+	mkfile -n 30m ./data/test_files/30mb.test
+	mkfile -n 40m ./data/test_files/40mb.test
+	mkfile -n 50m ./data/test_files/50mb.test
+	
+Upload these to your site bucket with:
+
+s3Bucket="s3://dev-agent-environment-site-ap-southeast-2-004050567325/test_files/"
+
+	cd data/test_files/
+	aws s3 sync \
+		--profile <profile> \
+	  	--exclude ".DS_Store" \
+	  	--acl public-read . \
+	  	s3://<stage>-agent-environment-site-<region>-<accountNumber>/test_files/
+	  	
+## User interface
+
+Amazon Connect agents are provided a link to the user interface including an API key which is validated by Lambda.
+
+The link has the following format:
+
+	https://<stage>-agent-environment-site-<region>-<accountNumber>.s3.<region>.amazonaws.com/index.html?apiKey=<apiKey>
+
+### Home
+![Home](docs/home.png)
+
+### Location
+![Location](docs/location.png)
+
+### Network
+![Network](docs/network.png)
+
+### Computer
+![Computer](docs/computer.png)
+
+### Audio
+![Audio](docs/audio.png)
+
+### Submit
+![Submit](docs/submit.png)
+
+## Sample data
+
+The output CSV file has the following fields:
+
+	captureDate
+	email
+	browserName
+	browserVersion
+	city
+	computerModel
+	country
+	csatConnect
+	csatSurvey
+	dailyRestart
+	deviceOwnership
+	downloadSpeed
+	headphonesConnection
+	headphonesMakeModel
+	internetCap
+	internetConnection
+	internetPlan
+	internetProvider
+	internetUserCount
+	internetUserType
+	ip
+	latency
+	location
+	networkConnection
+	operatingSystem
+	returnDate
+	uploadSpeed
+	vpnConnection
+	userAgent
+	notes
 
 ## Cost
 
+The system uses serverless technologies and should cost less than $2 USD per month to operate.
