@@ -64,7 +64,7 @@ function extractRecords(records, scanResponse)
   if (scanResponse.Items !== undefined)
   {
     scanResponse.Items.forEach(item => {
-      var keys = Object.keys(item);
+      var keys = Object.keys(item).sort();
       var record = {};
       keys.forEach(key => {
         record[key] = item[key].S;
@@ -72,6 +72,21 @@ function extractRecords(records, scanResponse)
       records.push(record);
     });
   }
+}
+
+function getUniqueKeys(records)
+{
+  var uniqueKeys = new Set();
+
+  records.forEach(record => {
+    var keys = Object.keys(record);
+
+    keys.forEach(key => {
+      uniqueKeys.add(key);
+    });
+  });
+
+  return Array.from(uniqueKeys.keys()).sort();
 }
 
 /**
@@ -89,13 +104,28 @@ async function exportDataToS3(records)
     if (records !== undefined && records.length > 0)
     {
       var headers = [];
-      var keys = Object.keys(records[0]);
+      var keys = getUniqueKeys(records);
 
+      // Put email and capture date at the lfront
+      headers.push({
+        id: 'email',
+        title: 'email'
+      });
+
+      headers.push({
+        id: 'captureDate',
+        title: 'captureDate'
+      });
+
+      // Add the other headers skipping email and capture date
       keys.forEach(key => {
-        headers.push({
-          id: key,
-          title: key
-        });
+        if (key !== 'email' && key !== 'captureDate')
+        {
+          headers.push({
+            id: key,
+            title: key
+          });
+        }
       });
 
       var writer = csvWriter({

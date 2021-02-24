@@ -122,6 +122,15 @@
         <small id="internetCapHelp" class="form-text text-muted">Do you have a monthly data cap on your internet and if so how much is it?</small>
       </div>
       <div class="form-group">
+        <label for="vpnConnection">VPN connection</label>
+        <select id="vpnConnection" class="form-control" aria-describedby=vpnConnectionHelp">
+          <option></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <small id="vpnConnectionHelp" class="form-text text-muted">Are you connected to a VPN when you use Amazon Connect?</small>
+      </div>      
+      <div class="form-group">
         <label for="downloadSpeed">Download speed (Mbps)</label>
         <input type="text" class="form-control" id="downloadSpeed" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>        
         <label for="uploadSpeed" class="pt-3">Upload speed (Mbps)</label>
@@ -244,9 +253,9 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-2 text-center pt-1 pb-3" id="dialogIcon"><i class="fas fa-exclamation-circle fa-danger fa-3x"></i></div>
-          <div class="col-10">
-            <p id="dialogMessage" class="pt-4"></p>
+          <div class="col-3 text-center pt-1 pb-3 text-center" id="dialogIcon"><i class="fas fa-exclamation-circle fa-danger fa-2x"></i></div>
+          <div class="col-9">
+            <p id="dialogMessage" class="pt-3"></p>
           </dsiv>
         </div>
       </div>
@@ -311,7 +320,7 @@ $.fn.datepicker.defaults.autoclose = true;
     {
       pageError('identity');
       showMessageDialog('Complete required fields', 
-        'Please complete all identity fields', 'warning');
+        'Please complete all fields', 'warning');
     }
   }
 
@@ -343,7 +352,7 @@ $.fn.datepicker.defaults.autoclose = true;
     {
       pageError('location');
       showMessageDialog('Complete required fields', 
-        'Please complete all location fields', 'warning');
+        'Please complete all fields', 'warning');
     }
   } 
 
@@ -373,7 +382,8 @@ $.fn.datepicker.defaults.autoclose = true;
     var internetProvider = $('#internetProvider').val();
     var internetPlan = $('#internetPlan').val();
     var internetCap = $('#internetCap').val();
-
+    var vpnConnection = $('#vpnConnection').val();
+    
     var downloadSpeed = $('#downloadSpeed').val();
     var uploadSpeed = $('#uploadSpeed').val();
     var latency = $('#latency').val();
@@ -394,7 +404,8 @@ $.fn.datepicker.defaults.autoclose = true;
         internetUserType !== '' && 
         internetProvider !== '' &&
         internetPlan !== '' &&
-        internetCap !== '')
+        internetCap !== '' && 
+        vpnConnection !== '')
     {
       if (!isNumber.test(internetUserCount))
       {
@@ -412,6 +423,7 @@ $.fn.datepicker.defaults.autoclose = true;
       results.internetProvider = internetProvider;
       results.internetPlan = internetPlan;
       results.internetCap = internetCap;
+      results.vpnConnection = vpnConnection;
 
       results.downloadSpeed = downloadSpeed;
       results.uploadSpeed = uploadSpeed;
@@ -424,7 +436,7 @@ $.fn.datepicker.defaults.autoclose = true;
     {
       pageError('network');
       showMessageDialog('Complete required fields', 
-        'Please complete all network fields', 'warning');
+        'Please complete all fields', 'warning');
     }
   }  
 
@@ -470,7 +482,7 @@ $.fn.datepicker.defaults.autoclose = true;
     {
       pageError('computer');
       showMessageDialog('Complete required fields', 
-        'Please complete all computer fields', 'warning');
+        'Please complete all fields', 'warning');
     }
   } 
 
@@ -500,7 +512,7 @@ $.fn.datepicker.defaults.autoclose = true;
     {
       pageError('audio');
       showMessageDialog('Complete required fields', 
-        'Please complete all audio fields', 
+        'Please complete all fields', 
         'warning');
     }
   }
@@ -633,15 +645,15 @@ $.fn.datepicker.defaults.autoclose = true;
 
     if (type === 'success')
     {
-      $('#dialogIcon').html('<i class="fas fa-check-circle text-success fa-4x"></i>');
+      $('#dialogIcon').html('<i class="fas fa-check-circle text-success fa-3x"></i>');
     }
     else if (type === 'info')
     {
-      $('#dialogIcon').html('<i class="fas fa-info-circle text-success fa-4x"></i>');
+      $('#dialogIcon').html('<i class="fas fa-info-circle text-success fa-3x"></i>');
     }
     else if (type === 'warning')
     {
-      $('#dialogIcon').html('<i class="fas fa-exclamation-triangle text-warning fa-4x"></i>');
+      $('#dialogIcon').html('<i class="fas fa-exclamation-triangle text-warning fa-3x"></i>');
     }
   }
 
