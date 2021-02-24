@@ -3,7 +3,7 @@ var dynamoDB = new AWS.DynamoDB();
 var moment = require('moment');
 
 /**
- * Captures data from the agent and stires it in DynamoDB
+ * Captures data from the agent and stores it in DynamoDB
  */
 exports.handler = async(event, context, callback) =>
 {
