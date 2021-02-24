@@ -6,7 +6,7 @@ This project aims to provide a simple web interface to capture environmental inf
 
 ![Architecture diagram](docs/architecture.png)
 
-The system uses Amazon S3 to serve a single page web application  to agents. Agent fill in survey fields and run speed tests against Amazon S3 in the deployed region.
+The system uses Amazon S3 to serve a single page web application  to agents. Agents fill in survey fields and run speed tests against Amazon S3 in the deployed region.
 
 Results are then submitted via API Gateway and stored in Amazon DynamoDB via a Lambda function.
 
@@ -51,9 +51,17 @@ To deploy using [Serverless](https://www.serverless.com/) (creates and deploys a
 
 ### Deploy the web application
 
-You may then configure and deploy the static website to S3. Edit the file and enter your api end point:
+You may then configure and deploy the static website to S3. Edit the following file and enter your api end point:
   
-  	web/config/site_config.json
+	web/config/site_config.json	
+
+Replace the variables below:
+
+	{
+	  "version": "1.0.0",
+	  "api": "https://<API Gateway id>.execute-api.<region>.amazonaws.com/dev/agentenvironment",
+	  "origin": "https://<stage>-realtime-dashboard-site-<region>-<account number>.s3.<region>.amazonaws.com"
+	}
 
 Then deploy the web application to your site bucket:
 
@@ -66,7 +74,7 @@ Then deploy the web application to your site bucket:
 
 ### Create sample data files
 
-The system uses test file in S3 to calculate network performance, create these locally on mac using:
+The system uses test file in S3 to calculate network performance, create these locally on a Mac using:
 
 	mkdir -p ./data/test_files/
 	mkfile -n 1m ./data/test_files/1mb.test
@@ -79,8 +87,6 @@ The system uses test file in S3 to calculate network performance, create these l
 	
 Upload these to your site bucket with:
 
-s3Bucket="s3://dev-agent-environment-site-ap-southeast-2-004050567325/test_files/"
-
 	cd data/test_files/
 	aws s3 sync \
 		--profile <profile> \
@@ -88,13 +94,15 @@ s3Bucket="s3://dev-agent-environment-site-ap-southeast-2-004050567325/test_files
 	  	--acl public-read . \
 	  	s3://<stage>-agent-environment-site-<region>-<accountNumber>/test_files/
 	  	
-## User interface
+## Link format
 
 Amazon Connect agents are provided a link to the user interface including an API key which is validated by Lambda.
 
 The link has the following format:
 
 	https://<stage>-agent-environment-site-<region>-<accountNumber>.s3.<region>.amazonaws.com/index.html?apiKey=<apiKey>
+
+## User interface
 
 ### Home
 ![Home](docs/home.png)
