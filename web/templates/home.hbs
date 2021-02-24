@@ -124,7 +124,7 @@
       </div>
       <div class="form-group">
         <label for="vpnConnection">VPN connection</label>
-        <select id="vpnConnection" class="form-control" aria-describedby=vpnConnectionHelp">
+        <select id="vpnConnection" class="form-control" aria-describedby="vpnConnectionHelp">
           <option></option>
           <option value="true">Yes</option>
           <option value="false">No</option>
@@ -390,9 +390,13 @@ $.fn.datepicker.defaults.autoclose = true;
     if (location !== '' && city !== '' && country !== '')
     {
       results.location = location;
-      results.returnDate = returnDate;
       results.city = city;
       results.country = country;
+
+      if (returnDate !== '')
+      {
+        results.returnDate = returnDate;
+      }
 
       saveResults(results);
       pageSuccess('location');
@@ -582,7 +586,12 @@ $.fn.datepicker.defaults.autoclose = true;
         var results = await getResults();
         results.csatSurvey = toolingCSAT;
         results.csatConnect = connectCSAT;
-        results.notes = notes;
+
+        if (notes !== '')
+        {
+          results.notes = notes;
+        }
+
         saveResults(results);
 
         await sendResults(results);

@@ -532,7 +532,7 @@ async function sendResults(results)
       if (key !== 'objects' && key !== 'apiKey')
       {
         // Clean each field to remove anything that might trip up a CSV parser later
-        body[key] = results[key].replace(/[\r\n\s",]+/g, ' ');
+        body[key] = results[key].replace(/[\r\n\s",]+/g, ' ').trim();
       }
     });
 
