@@ -241,8 +241,7 @@ function createOffer(peerConnection, region, maxExecutionTime)
     });
 
     // Create the offer then start ice negotiation with setLocalDescription()
-    peerConnection.createOffer().then((sdp) => {
-      result.sdp = sdp;  
+    peerConnection.createOffer().then((sdp) => { 
       result.startTime = performance.now();
       return peerConnection.setLocalDescription(sdp);
     });

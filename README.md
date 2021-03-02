@@ -118,12 +118,18 @@ The output CSV file has the following fields:
 	browserVersion
 	city
 	computerModel
+	connectivity-ap-northeast-1
+	connectivity-ap-southeast-1
+	connectivity-ap-southeast-2
+	connectivity-eu-central-1
+	connectivity-eu-west-2
+	connectivity-us-east-1
+	connectivity-us-west-2
 	country
 	csatConnect
 	csatSurvey
 	dailyRestart
 	deviceOwnership
-	downloadSpeed
 	headphonesConnection
 	headphonesMakeModel
 	internetCap
@@ -133,12 +139,17 @@ The output CSV file has the following fields:
 	internetUserCount
 	internetUserType
 	ip
-	latency
+	latency-ap-northeast-1
+	latency-ap-southeast-1
+	latency-ap-southeast-2
+	latency-eu-central-1
+	latency-eu-west-2
+	latency-us-east-1
+	latency-us-west-2
 	location
 	networkConnection
 	operatingSystem
 	returnDate
-	uploadSpeed
 	vpnConnection
 	userAgent
 	notes
