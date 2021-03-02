@@ -130,19 +130,252 @@
           <option value="false">No</option>
         </select>
         <small id="vpnConnectionHelp" class="form-text text-muted">Are you connected to a VPN when you use Amazon Connect?</small>
-      </div>      
-      <div class="form-group">
-        <label for="downloadSpeed">Download speed (Mbps)</label>
-        <input type="text" class="form-control" id="downloadSpeed" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>        
-        <label for="uploadSpeed" class="pt-3">Upload speed (Mbps)</label>
-        <input type="text" class="form-control" id="uploadSpeed" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>
-        <label for="latency" class="pt-3">Latency (ms)</label>
-        <input type="text" class="form-control" id="latency" aria-describedby="speedTestHelp" value="" placeholder="Pending ..." readonly>
-        <small id="speedTestHelp" class="form-text text-muted">Run the speed test to calculate the speed of your internet connection</small>
+      </div>   
+      <div class="text-center">
+        <button type="button" class="btn btn-primary" onClick="runNetworkTests();" id="networkTestButton">Run network tests</button>
       </div>
+      
+      <span id="testImageSpan"></span>
+
+      <div id="networkTests" class="form-group pt-3">
+
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2"></div>
+          <div class="col-2"><h5 class="pl-5">Voice</h5></div>
+          <div class="col-2"><h5 class="pl-5">Latency</h5></div>
+          <div class="col-3"></div>
+        </div>
+
+        <input type="hidden" id="networkTestsRun" value="false"/>
+
+        <!-- Virginia -->
+        <input type="hidden" id="connectivity-us-east-1"/>
+        <input type="hidden" id="latency-us-east-1"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>Virginia</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="connectivity-us-east-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="connectivity-us-east-1-success" style="display: none;"></i>
+                <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-us-east-1-error" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="connectivity-us-east-1-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="latency-us-east-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="latency-us-east-1-success" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="latency-us-east-1-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-3"></div>
+        </div>
+
+        <!-- Oregon -->
+        <input type="hidden" id="connectivity-us-west-2"/>
+        <input type="hidden" id="latency-us-west-2"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>Oregon</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="connectivity-us-west-2-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="connectivity-us-west-2-success" style="display: none;"></i>
+                <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-us-west-2-error" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="connectivity-us-west-2-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="latency-us-west-2-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="latency-us-west-2-success" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="latency-us-west-2-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-3"></div>
+        </div>        
+
+        <!-- Frankfurt -->
+        <input type="hidden" id="connectivity-eu-central-1"/>
+        <input type="hidden" id="latency-eu-central-1"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>Frankfurt</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="connectivity-eu-central-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="connectivity-eu-central-1-success" style="display: none;"></i>
+                <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-eu-central-1-error" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="connectivity-eu-central-1-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="latency-eu-central-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="latency-eu-central-1-success" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="latency-eu-central-1-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-3"></div>
+        </div>  
+
+        <!-- Sydney -->
+        <input type="hidden" id="connectivity-ap-southeast-2"/>
+        <input type="hidden" id="latency-ap-southeast-2"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>Sydney</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="connectivity-ap-southeast-2-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="connectivity-ap-southeast-2-success" style="display: none;"></i>
+                <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-ap-southeast-2-error" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="connectivity-ap-southeast-2-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="latency-ap-southeast-2-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="latency-ap-southeast-2-success" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="latency-ap-southeast-2-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-3"></div>
+        </div>  
+
+        <!-- Tokyo -->
+        <input type="hidden" id="connectivity-ap-northeast-1"/>
+        <input type="hidden" id="latency-ap-northeast-1"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>Toyko</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="connectivity-ap-northeast-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="connectivity-ap-northeast-1-success" style="display: none;"></i>
+                <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-ap-northeast-1-error" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="connectivity-ap-northeast-1-text">
+                Pending
+              </span>
+            </div> 
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="latency-ap-northeast-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="latency-ap-northeast-1-success" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="latency-ap-northeast-1-text">
+                Pending
+              </span>
+            </div> 
+          </div>
+          <div class="col-3"></div>
+        </div>  
+
+        <!-- Singapore -->
+        <input type="hidden" id="connectivity-ap-southeast-1"/>
+        <input type="hidden" id="latency-ap-southeast-1"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>Singapore</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+                <span class="network-icon">
+                  <i class="far fa-circle muted-circle fa-2x" id="connectivity-ap-southeast-1-pending"></i>
+                  <i class="fas fa-check-circle text-success fa-2x" id="connectivity-ap-southeast-1-success" style="display: none;"></i>
+                  <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-ap-southeast-1-error" style="display: none;"></i>
+                </span>
+                <span class="network-text" id="connectivity-ap-southeast-1-text">
+                  Pending
+                </span>
+              </div>
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+              <span class="network-icon">
+                <i class="far fa-circle muted-circle fa-2x" id="latency-ap-southeast-1-pending"></i>
+                <i class="fas fa-check-circle text-success fa-2x" id="latency-ap-southeast-1-success" style="display: none;"></i>
+              </span>
+              <span class="network-text" id="latency-ap-southeast-1-text">
+                Pending
+              </span>
+            </div>
+          </div>
+          <div class="col-3"></div>
+        </div>  
+
+        <!-- London -->
+        <input type="hidden" id="connectivity-eu-west-2"/>
+        <input type="hidden" id="latency-eu-west-2"/>
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-2 text-right region-name"><h5>London</h5></div>
+          <div class="col-2">
+            <div class="network-container">
+                <span class="network-icon">
+                  <i class="far fa-circle muted-circle fa-2x" id="connectivity-eu-west-2-pending"></i>
+                  <i class="fas fa-check-circle text-success fa-2x" id="connectivity-eu-west-2-success" style="display: none;"></i>
+                  <i class="fas fa-exclamation-triangle text-warning fa-2x" id="connectivity-eu-west-2-error" style="display: none;"></i>
+                </span>
+                <span class="network-text" id="connectivity-eu-west-2-text">
+                  Pending
+                </span>
+              </div>
+          </div>
+          <div class="col-2">
+            <div class="network-container">
+                <span class="network-icon">
+                  <i class="far fa-circle muted-circle fa-2x" id="latency-eu-west-2-pending"></i>
+                  <i class="fas fa-check-circle text-success fa-2x" id="latency-eu-west-2-success" style="display: none;"></i>
+                </span>
+                <span class="network-text" id="latency-eu-west-2-text">
+                  Pending
+                </span>
+              </div> 
+          </div>
+          <div class="col-3"></div>
+        </div>
+      </div>
+             
       <div class="text-center">
         <button type="button" class="btn btn-warning" onClick="cancel();">Cancel</i></button>
-        <button type="button" class="btn btn-primary" onClick="runSpeedTest();">Run internet speed test</button>
         <button type="button" id="networkNextButton" class="btn btn-primary" onClick="verifyNetwork();" style="display:none;">Next <i class="fas fa-chevron-circle-right"></i></button>
       </div>
     </form>
@@ -424,9 +657,11 @@ $.fn.datepicker.defaults.autoclose = true;
     delete results.internetPlan;
     delete results.internetCap;
 
-    delete results.downloadSpeed;
-    delete results.uploadSpeed;
-    delete results.latency;
+
+    allRegions.forEach(region => {
+      delete results['connectivity-' + region.region];
+      delete results['latency-' + region.region];
+    });
 
     var networkConnection = $('#networkConnection').val();
     var internetConnection = $('#internetConnection').val();
@@ -436,20 +671,21 @@ $.fn.datepicker.defaults.autoclose = true;
     var internetPlan = $('#internetPlan').val();
     var internetCap = $('#internetCap').val();
     var vpnConnection = $('#vpnConnection').val();
-    
-    var downloadSpeed = $('#downloadSpeed').val();
-    var uploadSpeed = $('#uploadSpeed').val();
-    var latency = $('#latency').val();
 
-    var isNumber = /^\d+$/;
-
-    if (downloadSpeed === '' || uploadSpeed === '' || latency === '')
+    if ($('#networkTestsRun').val() === 'false')
     {
       pageError('network');
-      showMessageDialog('No speed data', 
-        'Please run the network speed tests', 'warning');
+      showMessageDialog('Run network tests', 
+        'Please run the network tests', 'warning');
       return;
     }
+
+    allRegions.forEach(region => {
+      results['connectivity-' + region.region] = $('#connectivity-' + region.region).val();
+      results['latency-' + region.region] = $('#latency-' + region.region).val();
+    });
+
+    var isNumber = /^\d+$/;
 
     if (networkConnection !== '' && 
         internetConnection !== '' && 
@@ -477,10 +713,6 @@ $.fn.datepicker.defaults.autoclose = true;
       results.internetPlan = internetPlan;
       results.internetCap = internetCap;
       results.vpnConnection = vpnConnection;
-
-      results.downloadSpeed = downloadSpeed;
-      results.uploadSpeed = uploadSpeed;
-      results.latency = latency;
 
       saveResults(results);
       pageSuccess('network');

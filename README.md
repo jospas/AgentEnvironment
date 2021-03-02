@@ -1,4 +1,4 @@
-# Amazon Connect Agent Environment
+# Amazon Connect - Agent Environment
 
 This project aims to provide a simple web interface to capture environmental information from Amazon Connect Agents, including hardware and network configurations.
 
@@ -17,6 +17,14 @@ Changes to the DynamoDB table trigger a DynamoDB Stream which calls a Lambda fun
 To build locally you will require a Node.js and Serverless environment plus AWS credentials with sufficient permissions to deploy Lambda functions behind API Gateway, create IAM roles and policies, create DynamoDB tables, S3 buckets and copy data to S3.
 
 You will also need to verify that your Amazon S3 account settings allow objects to be [public by Object ACL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/configuring-block-public-access-account.html).
+
+### Check out from Git
+
+Check out the project from git locally with:
+
+	git clone git@github.com:jospas/AgentEnvironment.git AgentEnvironment
+
+
 
 ### Install dependencies
 
@@ -47,7 +55,7 @@ To deploy using [Serverless](https://www.serverless.com/) (creates and deploys a
 	    --region <region> \
 	    --apiKey <apiKey> \    
 	    --s3Prefix <s3Prefix> \
-	    --origin 'https://<stage>-agent-environment-site-<region>-<accountNumber>.s3-<region>.amazonaws.com'
+	    --origin 'https://<stage>-agent-environment-site-<region>-<accountNumber>.s3.<region>.amazonaws.com'
 
 ### Deploy the web application
 
@@ -60,7 +68,7 @@ Replace the variables below:
 	{
 	  "version": "1.0.0",
 	  "api": "https://<apigwid>.execute-api.<region>.amazonaws.com/dev/agentenvironment",
-	  "origin": "https://<stage>-realtime-dashboard-site-<region>-<account number>.s3.<region>.amazonaws.com"
+	  "origin": "https://<stage>-agent-environment-site-<region>-<account number>.s3.<region>.amazonaws.com"
 	}
 
 Then deploy the web application to your site bucket:
@@ -71,28 +79,6 @@ Then deploy the web application to your site bucket:
 	   --exclude '.DS_Store' \
 	   --acl public-read \
 	   . s3://<stage>-agent-environment-site-<region>-<accountNumber>
-
-### Create sample data files
-
-The system uses test file in S3 to calculate network performance, create these locally on a Mac using:
-
-	mkdir -p ./data/test_files/
-	mkfile -n 1m ./data/test_files/1mb.test
-	mkfile -n 5m ./data/test_files/5mb.test
-	mkfile -n 10m ./data/test_files/10mb.test
-	mkfile -n 20m ./data/test_files/20mb.test
-	mkfile -n 30m ./data/test_files/30mb.test
-	mkfile -n 40m ./data/test_files/40mb.test
-	mkfile -n 50m ./data/test_files/50mb.test
-	
-Upload these to your site bucket with:
-
-	cd data/test_files/
-	aws s3 sync \
-		--profile <profile> \
-	  	--exclude ".DS_Store" \
-	  	--acl public-read . \
-	  	s3://<stage>-agent-environment-site-<region>-<accountNumber>/test_files/
 	  	
 ## Link format
 

@@ -131,8 +131,6 @@ resources:
               Resource:
                 - !GetAtt S3BucketData.Arn
                 - !Join [ '', [ !GetAtt S3BucketData.Arn, '/*' ]]
-                - !GetAtt S3BucketSite.Arn
-                - !Join [ '', [ !GetAtt S3BucketSite.Arn, '/*' ]]
             - Effect: Allow
               Action: 
                 - dynamodb:PutItem

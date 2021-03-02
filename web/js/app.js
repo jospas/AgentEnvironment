@@ -559,8 +559,7 @@ async function checkLogin(apiKey)
 
     var response = await axios.get(siteConfig.api + '/login', options);
     return {
-      success: true,
-      uploadUrl: response.data.uploadUrl
+      success: true
     };
   }
   catch (error)
@@ -661,100 +660,6 @@ function connectCSAT(rating)
   highlightStars('connectCSAT', rating);
   $('#connectCSAT').val(rating);
 }
-
-/**
- * Runs an internet speed test by uploading and downloading files
- */
-async function runSpeedTest(e)
-{
-  try
-  {
-    var results = await getResults();
-    console.log('Refetched signed upload url');
-
-    results.loginResult = await checkLogin(results.apiKey);
-
-    $('#downloadSpeed').attr('placeholder', 'Calculating download speed...');
-    $('#downloadSpeed').val('');
-    $('#uploadSpeed').attr('placeholder', 'Pending...');
-    $('#uploadSpeed').val('');
-    $('#latency').attr('placeholder', 'Pending...');
-    $('#latency').val(''); 
-
-    var size = 50;
-    var seconds = await timeDownload(size);
-    var megabits = size * 8;
-    var megaBitsPerSec = megabits / seconds;
-
-    $('#downloadSpeed').val(megaBitsPerSec.toFixed(2));
-    $('#uploadSpeed').attr('placeholder', 'Calculating upload speed...');
-    $('#uploadSpeed').val('');
-
-    size = 10;
-    seconds = await timeUpload(size, results.objects.loginResults.uploadUrl);
-    megabits = size * 8;
-    megaBitsPerSec = megabits / seconds;
-    $('#uploadSpeed').val(megaBitsPerSec.toFixed(2));
-    $('#latency').attr('placeholder', 'Calculating latency...');
-
-    var latency = await timeLatency();
-    $('#latency').val(latency);
-
-    $('#networkNextButton').show();
-  }
-  catch (error)
-  {
-    console.log('[ERROR] Speed tests failed to run', error);
-    pageError('network');
-    renderStages();
-    showMessageDialog('Speed tests failed', 'Speed tests failed to run, please check your network connectivity');
-    return;
-  }
-}
-
-async function timeDownload(size, iterations)
-{
-  var data = await axios.get('test_files/' + size + 'mb.test');
-  var resources = performance.getEntriesByType('resource');
-  var lastResource = resources[resources.length - 1];
-  return (lastResource.responseEnd - lastResource.responseStart) / 1000;
-}
-
-/**
- * Upload a file to S3
- */
-async function timeUpload(size, url)
-{
-  var payload = [];
-  var bytes = size * 1024 * 1024;
-  for (var i = 0; i < bytes; i++)
-  {
-    payload.push(0);
-  }
-
-  var options = {
-    headers: {
-      ContentType: 'text/plain'
-    }
-  };
-
-  var actualUrl = url.substring(siteConfig.origin.length);
-  var data = await axios.put(actualUrl, payload, options);
-  var resources = performance.getEntriesByType('resource');
-  var lastResource = resources[resources.length - 1];
-  return (lastResource.responseStart - lastResource.requestStart) / 1000;
-}
-
-/**
- * Download a small image from S3 and time it using performance timers
- */
-async function timeLatency()
-{
-  var data = await axios.get('img/1x1.png?t=' + Math.floor(Math.random() * 100000));
-  var resources = performance.getEntriesByType('resource');
-  var lastResource = resources[resources.length - 1];
-  return Math.floor(lastResource.responseStart - lastResource.requestStart);
-}  
 
 function showMessageDialog(title, message, type = 'warning')
 {

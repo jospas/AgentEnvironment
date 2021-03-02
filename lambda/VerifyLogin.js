@@ -1,6 +1,3 @@
-var AWS = require('aws-sdk');
-var s3 = new AWS.S3({ signatureVersion: 'v4' });
-
 /**
  * Verifies the API key and origin for a customer
  */
@@ -22,8 +19,7 @@ exports.handler = async(event, context, callback) =>
       return;
     }
 
-    var uploadUrl = await getPresignedPut(process.env.UPLOAD_BUCKET, process.env.UPLOAD_KEY);
-    callback(null, buildSuccessfulResponse({ uploadUrl: uploadUrl }));
+    callback(null, buildSuccessfulResponse({ status: 'success' }));
 
   }
   catch (error)
@@ -32,19 +28,6 @@ exports.handler = async(event, context, callback) =>
     callback(null, buildErrorResponse(error)); 
   }
 };
-
-async function getPresignedPut(bucket, key)
-{
-  var putParams = {
-    Bucket: bucket, 
-    Key: key,
-    Expires: 5 * 60,
-    ACL: 'bucket-owner-full-control',
-    ContentType: 'text/plain'
-  };
-
-  return await s3.getSignedUrl('putObject', putParams);
-}
 
 /**
  * Checks the agent's API key
