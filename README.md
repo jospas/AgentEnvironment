@@ -137,13 +137,6 @@ The output CSV file has the following fields:
 	browserVersion
 	city
 	computerModel
-	media-ap-northeast-1
-	media-ap-southeast-1
-	media-ap-southeast-2
-	media-eu-central-1
-	media-eu-west-2
-	media-us-east-1
-	media-us-west-2
 	country
 	csatConnect
 	csatSurvey
@@ -169,6 +162,13 @@ The output CSV file has the following fields:
 	signalling-eu-west-2
 	signalling-us-east-1
 	signalling-us-west-2
+	voice-ap-northeast-1
+	voice-ap-southeast-1
+	voice-ap-southeast-2
+	voice-eu-central-1
+	voice-eu-west-2
+	voice-us-east-1
+	voice-us-west-2
 	vpnConnection
 	userAgent
 	notes
