@@ -117,13 +117,14 @@ function resetNetworkTests()
     $('#latency-' + allRegions[r].region + '-text').html('Pending');
 
     $('#connectivity-' + allRegions[r].region + '-success').hide();
+    $('#connectivity-' + allRegions[r].region + '-error').hide();
     $('#connectivity-' + allRegions[r].region + '-pending').show();
     $('#connectivity-' + allRegions[r].region + '-text').html('Pending');
   }
 }
 
 /**
- * Fiered when all neywork tests complete
+ * Fired when all network tests complete
  */
 function networkTestsComplete()
 {
