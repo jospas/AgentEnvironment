@@ -71,7 +71,7 @@
         <select id="networkConnection" class="form-control" aria-describedby="networkConnectionHelp">
           <option></option>
           <option value="WIRELESS">Wireless connection</option>
-          <option value="WIRED">Wired connection</option>s
+          <option value="WIRED">Wired connection</option>
         </select>
         <small id="networkConnectionHelp" class="form-text text-muted">How is your computer connected to the network?</small>
       </div>
@@ -86,6 +86,7 @@
           <option value="NBN">NBN internet</option>
           <option value="WIRELESS">Wireless internet</option>
           <option value="OFFICE">Office or Call Center network</option>
+          <option value="UNKNOWN">I don't know</option>
           <option value="OTHER">Other</option>
         </select>
         <small id="internetConnectionHelp" class="form-text text-muted">What type of connection to the internet do you have?</small>
@@ -115,12 +116,12 @@
       <div class="form-group">
         <label for="internetPlan">Internet plan</label>
         <input type="text" class="form-control" id="internetPlan" aria-describedby="internetPlanHelp" value="" placeholder="Your internet plan">  
-        <small id="internetPlanHelp" class="form-text text-muted">What is your internet plan (leave blank for work provided internet)</small>
+        <small id="internetPlanHelp" class="form-text text-muted">Describe your internet plan or enter <i>Office</i> if you are on office network.</small>
       </div>
       <div class="form-group">
         <label for="internetCap">Monthly internet data</label>
         <input type="text" class="form-control" id="internetCap" aria-describedby="internetCapHelp" value="" placeholder="Monthly data cap">  
-        <small id="internetCapHelp" class="form-text text-muted">Do you have a monthly data cap on your internet and if so how much is it?</small>
+        <small id="internetCapHelp" class="form-text text-muted">Do you have a monthly data cap on your internet data? Enter your data quota in gigabytes or <i>Unlimited</i> if you have no data cap or are on an office network.</small>
       </div>
       <div class="form-group">
         <label for="vpnConnection">VPN connection</label>
@@ -128,8 +129,9 @@
           <option></option>
           <option value="true">Yes</option>
           <option value="false">No</option>
+          <option value="unknown">I don't know</option>
         </select>
-        <small id="vpnConnectionHelp" class="form-text text-muted">Are you connected to a VPN when you use Amazon Connect?</small>
+        <small id="vpnConnectionHelp" class="form-text text-muted">Are you usually connected to a VPN when you use Amazon Connect? Please connect now if you usually use a VPN.</small>
       </div>   
       <div class="text-center">
         <button type="button" class="btn btn-primary" onClick="runNetworkTests();" id="networkTestButton">Run network tests</button>
@@ -140,11 +142,11 @@
       <div id="networkTests" class="form-group pt-3">
 
         <div class="row">
-          <div class="col-3"></div>
           <div class="col-2"></div>
-          <div class="col-2"><h5 class="pl-5">Voice</h5></div>
-          <div class="col-2"><h5 class="pl-5">Latency</h5></div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
+          <div class="col-3"><h5>Voice (UDP)</h5></div>
+          <div class="col-3"><h5>Signalling (TCP)</h5></div>
+          <div class="col-2"></div>
         </div>
 
         <input type="hidden" id="networkTestsRun" value="false"/>
@@ -153,9 +155,9 @@
         <input type="hidden" id="connectivity-us-east-1"/>
         <input type="hidden" id="latency-us-east-1"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>Virginia</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="connectivity-us-east-1-pending"></i>
@@ -167,7 +169,7 @@
               </span>
             </div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="latency-us-east-1-pending"></i>
@@ -178,16 +180,16 @@
               </span>
             </div>
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>
 
         <!-- Oregon -->
         <input type="hidden" id="connectivity-us-west-2"/>
         <input type="hidden" id="latency-us-west-2"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>Oregon</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="connectivity-us-west-2-pending"></i>
@@ -199,7 +201,7 @@
               </span>
             </div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="latency-us-west-2-pending"></i>
@@ -210,16 +212,16 @@
               </span>
             </div>
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>        
 
         <!-- Frankfurt -->
         <input type="hidden" id="connectivity-eu-central-1"/>
         <input type="hidden" id="latency-eu-central-1"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>Frankfurt</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="connectivity-eu-central-1-pending"></i>
@@ -231,7 +233,7 @@
               </span>
             </div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="latency-eu-central-1-pending"></i>
@@ -242,16 +244,16 @@
               </span>
             </div>
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>  
 
         <!-- Sydney -->
         <input type="hidden" id="connectivity-ap-southeast-2"/>
         <input type="hidden" id="latency-ap-southeast-2"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>Sydney</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="connectivity-ap-southeast-2-pending"></i>
@@ -263,7 +265,7 @@
               </span>
             </div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="latency-ap-southeast-2-pending"></i>
@@ -274,16 +276,16 @@
               </span>
             </div>
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>  
 
         <!-- Tokyo -->
         <input type="hidden" id="connectivity-ap-northeast-1"/>
         <input type="hidden" id="latency-ap-northeast-1"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>Toyko</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="connectivity-ap-northeast-1-pending"></i>
@@ -295,7 +297,7 @@
               </span>
             </div> 
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="latency-ap-northeast-1-pending"></i>
@@ -306,16 +308,16 @@
               </span>
             </div> 
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>  
 
         <!-- Singapore -->
         <input type="hidden" id="connectivity-ap-southeast-1"/>
         <input type="hidden" id="latency-ap-southeast-1"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>Singapore</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
                 <span class="network-icon">
                   <i class="far fa-circle muted-circle fa-2x" id="connectivity-ap-southeast-1-pending"></i>
@@ -327,7 +329,7 @@
                 </span>
               </div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
               <span class="network-icon">
                 <i class="far fa-circle muted-circle fa-2x" id="latency-ap-southeast-1-pending"></i>
@@ -338,16 +340,16 @@
               </span>
             </div>
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>  
 
         <!-- London -->
         <input type="hidden" id="connectivity-eu-west-2"/>
         <input type="hidden" id="latency-eu-west-2"/>
         <div class="row">
-          <div class="col-3"></div>
+          <div class="col-2"></div>
           <div class="col-2 text-right region-name"><h5>London</h5></div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
                 <span class="network-icon">
                   <i class="far fa-circle muted-circle fa-2x" id="connectivity-eu-west-2-pending"></i>
@@ -359,7 +361,7 @@
                 </span>
               </div>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <div class="network-container">
                 <span class="network-icon">
                   <i class="far fa-circle muted-circle fa-2x" id="latency-eu-west-2-pending"></i>
@@ -370,7 +372,7 @@
                 </span>
               </div> 
           </div>
-          <div class="col-3"></div>
+          <div class="col-2"></div>
         </div>
       </div>
              
@@ -681,8 +683,8 @@ $.fn.datepicker.defaults.autoclose = true;
     }
 
     allRegions.forEach(region => {
-      results['connectivity-' + region.region] = $('#connectivity-' + region.region).val();
-      results['latency-' + region.region] = $('#latency-' + region.region).val();
+      results['voice-' + region.region] = $('#connectivity-' + region.region).val();
+      results['signalling-' + region.region] = $('#latency-' + region.region).val();
     });
 
     var isNumber = /^\d+$/;

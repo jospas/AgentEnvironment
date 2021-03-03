@@ -24,7 +24,12 @@ Check out the project from git locally with:
 
 	git clone git@github.com:jospas/AgentEnvironment.git AgentEnvironment
 
+### Clone the Git repository
 
+Clone the Git repository and change to the project directory:
+
+	> git clone git@github.com:jospas/AgentEnvironment.git
+	> cd AgentEnvironment
 
 ### Install dependencies
 
@@ -34,11 +39,14 @@ For example on a Mac using [Home Brew](https://brew.sh/):
 
   	> brew install npm
   	> npm install -g serverless
+  	
+Ensure you are in the project directory then install the project NPM dependencies:
+  	
   	> npm install
 
 ### Deploy the infrastructure
 
-You will require the following variables for this step with [default values] listed in square brackets.
+You will require the following variables for this step with `[default values]` listed in square brackets.
 
 	<stage> the desired environment (dev, test or prod) [dev]
   	<profile> the name of a local AWS credentials profile [connect]
@@ -46,16 +54,25 @@ You will require the following variables for this step with [default values] lis
   	<apiKey> a long random string of your choice to protect the web application [CHANGEME]
   	<s3Prefix> the prefix to use in the data bucket when exporting data to S3 [agentdata]
   	<accountNumber> your AWS account number
-  	<origin> your S3 site bucket origin [CHANGEME]
+  	<origin> your S3 site bucket origin [CHANGEME] 
+  	  https://<stage>-agent-environment-site-<region>-<accountNumber>.s3.<region>.amazonaws.com 
 
-To deploy using [Serverless](https://www.serverless.com/) (creates and deploys a CloudFormation stack) execute the following command replacing the variables from above:
+To deploy using [Serverless](https://www.serverless.com/) (creates and deploys a CloudFormation stack) execute the following command replacing the variables from above in the root of the project directory:
 
 	  > serverless deploy --stage <stage> \
 	    --profile <profile> \
 	    --region <region> \
-	    --apiKey <apiKey> \    
-	    --s3Prefix <s3Prefix> \
-	    --origin 'https://<stage>-agent-environment-site-<region>-<accountNumber>.s3.<region>.amazonaws.com'
+	    --apiKey '<apiKey>' \    
+	    --s3Prefix '<s3Prefix>' \
+	    --origin '<origin>'
+	    
+Note that serverless outputs API Gateway end points to the console:
+
+	endpoints:
+  		POST - https://<apigwid>.execute-api.<region>.amazonaws.com/<stage>/agentenvironment/data
+  		GET - https://<apigwid>.execute-api.<region>.amazonaws.com/<stage>/agentenvironment/login
+  		
+Please note your `<apigwid>` for for the following step.
 
 ### Deploy the web application
 
@@ -63,18 +80,18 @@ You may then configure and deploy the static website to S3. Edit the following f
   
 	web/config/site_config.json	
 
-Replace the variables below:
+Replace the variables below, *respecting no trailng slash* on the API url:
 
 	{
 	  "version": "1.0.0",
 	  "api": "https://<apigwid>.execute-api.<region>.amazonaws.com/dev/agentenvironment",
-	  "origin": "https://<stage>-agent-environment-site-<region>-<account number>.s3.<region>.amazonaws.com"
+	  "origin": "https://<stage>-agent-environment-site-<region>-<accountNumber>.s3.<region>.amazonaws.com"
 	}
 
 Then deploy the web application to your site bucket:
 
     > cd web
-    > s3 cp --profile <profile> \
+    > aws s3 cp --profile <profile> \
 	   --recursive \
 	   --exclude '.DS_Store' \
 	   --acl public-read \
@@ -82,7 +99,7 @@ Then deploy the web application to your site bucket:
 	  	
 ## Link format
 
-Amazon Connect agents are provided a link to the user interface including an API key which is validated by Lambda.
+Amazon Connect agents are provided a link to the user interface including an API key which is validated by the Lambda functions.
 
 The link has the following format:
 
@@ -118,13 +135,13 @@ The output CSV file has the following fields:
 	browserVersion
 	city
 	computerModel
-	connectivity-ap-northeast-1
-	connectivity-ap-southeast-1
-	connectivity-ap-southeast-2
-	connectivity-eu-central-1
-	connectivity-eu-west-2
-	connectivity-us-east-1
-	connectivity-us-west-2
+	media-ap-northeast-1
+	media-ap-southeast-1
+	media-ap-southeast-2
+	media-eu-central-1
+	media-eu-west-2
+	media-us-east-1
+	media-us-west-2
 	country
 	csatConnect
 	csatSurvey
@@ -139,17 +156,17 @@ The output CSV file has the following fields:
 	internetUserCount
 	internetUserType
 	ip
-	latency-ap-northeast-1
-	latency-ap-southeast-1
-	latency-ap-southeast-2
-	latency-eu-central-1
-	latency-eu-west-2
-	latency-us-east-1
-	latency-us-west-2
 	location
 	networkConnection
 	operatingSystem
 	returnDate
+	signalling-ap-northeast-1
+	signalling-ap-southeast-1
+	signalling-ap-southeast-2
+	signalling-eu-central-1
+	signalling-eu-west-2
+	signalling-us-east-1
+	signalling-us-west-2
 	vpnConnection
 	userAgent
 	notes
