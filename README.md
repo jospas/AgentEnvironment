@@ -62,7 +62,8 @@ To deploy using [Serverless](https://www.serverless.com/) (creates and deploys a
 	  > serverless deploy --stage <stage> \
 	    --profile <profile> \
 	    --region <region> \
-	    --apiKey '<apiKey>' \    
+	    --apiKey '<apiKey>' \
+	    --accountNumber '<accountNumber>' \
 	    --s3Prefix '<s3Prefix>' \
 	    --origin '<origin>'
 	    
@@ -173,19 +174,30 @@ The output CSV file has the following fields:
 	userAgent
 	notes
 	
+## Harvesting results
+
+Results are written to the S3 data bucket and can be collected using the AWS CLI or via the AWS S3 Console:
+
+    s3://<stage>-agent-environment-sata-<region>-<accountNumber>/<s3Prefix>/agent_environment.csv
+
+JSON data is also written to the S3 data bucket:
+
+    s3://<stage>-agent-environment-sata-<region>-<accountNumber>/<s3Prefix>/agent_environment.json
+
 ## Security
 
 The API key provided at deployment time protects the API Gateway end points and is required to submit results.
 
 To expire existing API keys, simply redeploy the solution with a new API key.
 
-CSV and JSON data written to the data S3 bucket is not exposed in any fasion, administrators must harvest this from Amazon S3 when required.
+Agent data written to DynamoDB is encrypted at rest using KMS.
+
+CSV and JSON data written to the data S3 bucket is not exposed in any fashion, administrators must harvest this from Amazon S3 when required and is encrypted at rest using KMS.
 
 ## Potential enhancements
 
-- Add Amazon S3 bucket encryption for the data bucket
 - Daily email of captured results
 
 ## Cost
 
-The system uses serverless technologies and should cost less than $2 USD per month to operate.
+The system uses serverless technologies and should cost less than $5 USD per month to operate (includes $2 USD KMS costs).

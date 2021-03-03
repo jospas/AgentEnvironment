@@ -14,6 +14,8 @@ provider:
 custom:
   origin: ${opt:origin, 'CHANGEME'}
   apiKey: ${opt:apiKey, 'CHANGEME'}
+  region: ${opt:region, 'CHANGEME'}
+  accountNumber: ${opt:accountNumber, 'CHANGEME'}
   s3Prefix: ${opt:s3Prefix, 'agentdata'}
 
 package:
@@ -103,7 +105,7 @@ resources:
     LambdaRole:
       Type: 'AWS::IAM::Role'
       Properties:
-        RoleName: !Join [ '-', [ '${self:provider.stage}', !Ref 'AWS::StackName', !Ref 'AWS::Region', 'role' ]]
+        RoleName: '${self:provider.stage}-${self:service}-${self:provider.region}-role'
         AssumeRolePolicyDocument: 
           Version: '2012-10-17'
           Statement: 
@@ -119,18 +121,17 @@ resources:
     LambdaPolicy:
       Type: 'AWS::IAM::ManagedPolicy'
       Properties:
-        ManagedPolicyName: !Join [ '-', [ '${self:provider.stage}', !Ref 'AWS::StackName', !Ref 'AWS::Region', 'policy' ]]
-        Description: 'Managed policy for lambda execution'
+        ManagedPolicyName: '${self:provider.stage}-${self:service}-${self:provider.region}-policy'
+        Description: 'Managed policy for Lambda execution'
         PolicyDocument: 
           Version: '2012-10-17'
           Statement:
             - Effect: Allow
               Action: 
-                - s3:Get*
                 - s3:PutObject
               Resource:
-                - !GetAtt S3BucketData.Arn
-                - !Join [ '', [ !GetAtt S3BucketData.Arn, '/*' ]]
+                - 'arn:aws:s3:::${self:provider.stage}-${self:service}-data-${self:provider.region}-${self:custom.accountNumber}'
+                - 'arn:aws:s3:::${self:provider.stage}-${self:service}-data-${self:provider.region}-${self:custom.accountNumber}/*'
             - Effect: Allow
               Action: 
                 - dynamodb:PutItem
@@ -145,15 +146,120 @@ resources:
                 - dynamodb:ListStreams
                 - dynamodb:ListShards
               Resource: 
-                - !Join [ ':', [ 'arn:aws:dynamodb', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'table/${self:provider.stage}-agent-environment-data' ]]
-                - !Join [ ':', [ 'arn:aws:dynamodb', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'table/${self:provider.stage}-agent-environment-data/*' ]]                
+                - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.accountNumber}:table/${self:provider.stage}-agent-environment-data'
+                - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.accountNumber}:table/${self:provider.stage}-agent-environment-data/*'               
             - Effect: Allow
               Action:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
               Resource: 
-                - !Join [ ':', [ 'arn:aws:logs', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'log-group:/aws/lambda/*:*:*' ] ]
+                - 'arn:aws:logs:${self:provider.region}:${self:custom.accountNumber}:log-group:/aws/lambda/*:*:*'
+
+    DynamoKMSKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: !Sub 'Encrypts DynamoDB table data'
+        KeyPolicy:
+          Version: '2012-10-17'
+          Id: 'dynamo-${self:provider.stage}-${self:service}-key'
+          Statement:
+            -
+              Sid: 'Allow root administration of the key'
+              Effect: 'Allow'
+              Principal:
+                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+              Action:
+                - 'kms:*'
+              Resource: '*'
+            -
+              Sid: 'Allow root use of the key'
+              Effect: 'Allow'
+              Principal:
+                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+              Action:
+                - 'kms:Encrypt'
+                - 'kms:Decrypt'
+                - 'kms:ReEncrypt*'
+                - 'kms:GenerateDataKey*'
+                - 'kms:DescribeKey'
+              Resource: '*'
+            -
+              Sid: 'Allow DynamoDB to use the key via Lambda'
+              Effect: 'Allow'
+              Principal: 
+                AWS: !GetAtt LambdaRole.Arn
+              Action:
+                - 'kms:Encrypt'
+                - 'kms:Decrypt'
+                - 'kms:ReEncrypt*'
+                - 'kms:GenerateDataKey*'
+                - 'kms:DescribeKey'
+                - 'kms:CreateGrant'
+              Condition:
+                StringLike: 
+                  kms:ViaService: 
+                    - 'dynamodb.${self:provider.region}.amazonaws.com'
+              Resource: '*'
+
+    DynamoKMSAlias:
+      Type: AWS::KMS::Alias
+      Properties:
+        AliasName: 'alias/dynamo-${self:provider.stage}-${self:service}-key'
+        TargetKeyId: !Ref DynamoKMSKey
+
+    S3KMSKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: !Sub 'Encrypts S3 data'
+        KeyPolicy:
+          Version: '2012-10-17'
+          Id: 's3-${self:provider.stage}-${self:service}-key'
+          Statement:
+            -
+              Sid: 'Allow root administration of the key'
+              Effect: 'Allow'
+              Principal:
+                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+              Action:
+                - 'kms:*'
+              Resource: '*'
+            -
+              Sid: 'Allow root use of the key'
+              Effect: 'Allow'
+              Principal:
+                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+              Action:
+                - 'kms:Encrypt'
+                - 'kms:Decrypt'
+                - 'kms:ReEncrypt*'
+                - 'kms:GenerateDataKey*'
+                - 'kms:DescribeKey'
+              Resource: '*'
+            -
+              Sid: 'Allow S3 to use the key for encryption via Lambda'
+              Effect: 'Allow'
+              Principal: 
+                AWS: !GetAtt LambdaRole.Arn
+              Action:
+                - 'kms:Encrypt'
+                - 'kms:Decrypt'
+                - 'kms:ReEncrypt*'
+                - 'kms:GenerateDataKey*'
+                - 'kms:DescribeKey'
+                - 'kms:CreateGrant'
+              Condition:
+                StringLike: 
+                  kms:ViaService: 's3.${self:provider.region}.amazonaws.com'
+                  kms:CallerAccount: '${self:custom.accountNumber}'
+              Resource: 
+                - '*'
+
+    S3KMSAlias:
+      Type: AWS::KMS::Alias
+      Properties:
+        AliasName: 'alias/s3-${self:provider.stage}-${self:service}-key'
+        TargetKeyId: !Ref S3KMSKey
 
     AgentDataTable:
       Type: 'AWS::DynamoDB::Table'
@@ -172,11 +278,15 @@ resources:
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
+        SSESpecification:
+          KMSMasterKeyId: !Ref DynamoKMSKey
+          SSEEnabled: true
+          SSEType: KMS
 
     S3BucketSite:
       Type: 'AWS::S3::Bucket'
       Properties:
-        BucketName: !Join [ '-', [ '${self:provider.stage}', '${self:service}', 'site', !Ref AWS::Region, !Ref AWS::AccountId ]]
+        BucketName: '${self:provider.stage}-${self:service}-site-${self:provider.region}-${self:custom.accountNumber}'
         CorsConfiguration:
           CorsRules:
             -
@@ -195,7 +305,7 @@ resources:
     S3BucketData:
       Type: 'AWS::S3::Bucket'
       Properties:
-        BucketName: !Join [ '-', [ '${self:provider.stage}', '${self:service}', 'data', !Ref AWS::Region, !Ref AWS::AccountId ]]
+        BucketName: '${self:provider.stage}-${self:service}-data-${self:provider.region}-${self:custom.accountNumber}'
         CorsConfiguration:
           CorsRules:
             -
@@ -209,4 +319,12 @@ resources:
                 - POST
                 - DELETE
                 - HEAD
-              MaxAge: 3000              
+              MaxAge: 3000 
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: 'aws:kms'
+                KMSMasterKeyID: !GetAtt S3KMSKey.Arn
+              BucketKeyEnabled: true
+
+
