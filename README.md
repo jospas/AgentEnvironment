@@ -74,6 +74,8 @@ Note that serverless outputs API Gateway end points to the console:
   		
 Please note your `<apigwid>` for for the following step.
 
+![Serverless deploy](docs/deploy.png)
+
 ### Deploy the web application
 
 You may then configure and deploy the static website to S3. Edit the following file and enter your api end point and origin:
