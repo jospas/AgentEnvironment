@@ -219,8 +219,9 @@ function getPeerConnection(nlbs)
 }
 
 /**
- * Times making an ofer until ice gathering is complete against an NLB end point
- * and will time out if this takes more than maxExecutionTime milliseconds
+ * Times making an offer until ice gathering is complete (via 401 auth failure) 
+ * against a Connect NLB end point in region. This will time out if this takes 
+ * more than maxExecutionTime milliseconds.
  */
 function createOffer(peerConnection, region, maxExecutionTime)
 {
@@ -230,7 +231,8 @@ function createOffer(peerConnection, region, maxExecutionTime)
       region: region
     };
 
-    // Listen for IPV4 errors
+    // Listen for 401 auth failures that indicate we actually 
+    // reached the TURN server via UDP and got rejected via UDP
     peerConnection.addEventListener('icecandidateerror', (event) => {
       if (event.errorCode === 401)
       {
@@ -262,12 +264,13 @@ async function testTURNServer(region, nlbs)
 {
   try
   {
-    // Create the peer connection to the stun server via the NLB
+    // Create the peer connection to the TURN server via the Connect NLB
     var peerConnection = getPeerConnection(nlbs);
 
     // Create a dummy data channel
     peerConnection.createDataChannel(''); 
 
+    // Start the connection process, waiting for a 401 auth failure or a timeout after 1 second
     var result = await createOffer(peerConnection, region, 1000);
 
     if (result.success)
