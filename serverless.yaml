@@ -2,24 +2,16 @@ service: agent-environment
 
 provider:
   name: aws
-  region: ${opt:region, 'ap-southeast-2'}
+  region: ${env:region, 'ap-southeast-2'}
   runtime: nodejs12.x
   endpointType: REGIONAL
-  stage: ${opt:stage, 'dev'}
-  profile: ${opt:profile, 'connect'}
+  stage: ${env:stage, 'dev'}
   logRetentionInDays: 14
   apiGateway:
     shouldStartNameWithService: true
 
-custom:
-  origin: ${opt:origin, 'CHANGEME'}
-  apiKey: ${opt:apiKey, 'CHANGEME'}
-  region: ${opt:region, 'CHANGEME'}
-  accountNumber: ${opt:accountNumber, 'CHANGEME'}
-  s3Prefix: ${opt:s3Prefix, 'agentdata'}
-
 package:
-  individually: true 
+  individually: true
 
 functions:
   capturedata:
@@ -31,7 +23,7 @@ functions:
       - http:
           path: agentenvironment/data
           method: post
-          cors: true   
+          cors: true
     package:
       exclude:
         - '**'
@@ -43,9 +35,9 @@ functions:
     environment:
       REGION: '${self:provider.region}'
       STAGE: '${self:provider.stage}'
-      API_KEY: '${self:custom.apiKey}'
-      ORIGIN: '${self:custom.origin}'
-      AGENT_DATA_TABLE: !Ref AgentDataTable 
+      API_KEY: '${env:apiKey}'
+      ORIGIN: '${env:origin}'
+      AGENT_DATA_TABLE: !Ref AgentDataTable
 
   verifylogin:
     handler: lambda/VerifyLogin.handler
@@ -63,8 +55,8 @@ functions:
     environment:
       REGION: '${self:provider.region}'
       STAGE: '${self:provider.stage}'
-      API_KEY: '${self:custom.apiKey}'
-      ORIGIN: '${self:custom.origin}'
+      API_KEY: '${env:apiKey}'
+      ORIGIN: '${env:origin}'
       UPLOAD_BUCKET: !Ref S3BucketSite
       UPLOAD_KEY: 'test_files/uploaded.test'
     events:
@@ -96,7 +88,7 @@ functions:
       STAGE: '${self:provider.stage}'
       AGENT_DATA_TABLE: !Ref AgentDataTable
       S3_BUCKET: !Ref S3BucketData
-      S3_PREFIX: '${self:custom.s3Prefix}'  
+      S3_PREFIX: '${env:s3Prefix}'
 
 resources:
   Description: 'Amazon Connect Agent Environment'
@@ -106,34 +98,34 @@ resources:
       Type: 'AWS::IAM::Role'
       Properties:
         RoleName: '${self:provider.stage}-${self:service}-${self:provider.region}-role'
-        AssumeRolePolicyDocument: 
+        AssumeRolePolicyDocument:
           Version: '2012-10-17'
-          Statement: 
+          Statement:
             - Effect: 'Allow'
-              Principal: 
-                Service: 
+              Principal:
+                Service:
                   - 'lambda.amazonaws.com'
-              Action: 
+              Action:
                 - 'sts:AssumeRole'
         ManagedPolicyArns:
-          - !Ref LambdaPolicy 
+          - !Ref LambdaPolicy
 
     LambdaPolicy:
       Type: 'AWS::IAM::ManagedPolicy'
       Properties:
         ManagedPolicyName: '${self:provider.stage}-${self:service}-${self:provider.region}-policy'
         Description: 'Managed policy for Lambda execution'
-        PolicyDocument: 
+        PolicyDocument:
           Version: '2012-10-17'
           Statement:
             - Effect: Allow
-              Action: 
+              Action:
                 - s3:PutObject
               Resource:
-                - 'arn:aws:s3:::${self:provider.stage}-${self:service}-data-${self:provider.region}-${self:custom.accountNumber}'
-                - 'arn:aws:s3:::${self:provider.stage}-${self:service}-data-${self:provider.region}-${self:custom.accountNumber}/*'
+                - 'arn:aws:s3:::${self:provider.stage}-${self:service}-data-${self:provider.region}-${env:accountNumber}'
+                - 'arn:aws:s3:::${self:provider.stage}-${self:service}-data-${self:provider.region}-${env:accountNumber}/*'
             - Effect: Allow
-              Action: 
+              Action:
                 - dynamodb:PutItem
                 - dynamodb:Query
                 - dynamodb:GetItem
@@ -145,16 +137,16 @@ resources:
                 - dynamodb:GetShardIterator
                 - dynamodb:ListStreams
                 - dynamodb:ListShards
-              Resource: 
-                - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.accountNumber}:table/${self:provider.stage}-agent-environment-data'
-                - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.accountNumber}:table/${self:provider.stage}-agent-environment-data/*'               
+              Resource:
+                - 'arn:aws:dynamodb:${self:provider.region}:${env:accountNumber}:table/${self:provider.stage}-agent-environment-data'
+                - 'arn:aws:dynamodb:${self:provider.region}:${env:accountNumber}:table/${self:provider.stage}-agent-environment-data/*'
             - Effect: Allow
               Action:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
-              Resource: 
-                - 'arn:aws:logs:${self:provider.region}:${self:custom.accountNumber}:log-group:/aws/lambda/*:*:*'
+              Resource:
+                - 'arn:aws:logs:${self:provider.region}:${env:accountNumber}:log-group:/aws/lambda/*:*:*'
 
     DynamoKMSKey:
       Type: AWS::KMS::Key
@@ -168,7 +160,7 @@ resources:
               Sid: 'Allow root administration of the key'
               Effect: 'Allow'
               Principal:
-                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+                AWS: 'arn:aws:iam::${env:accountNumber}:root'
               Action:
                 - 'kms:*'
               Resource: '*'
@@ -176,7 +168,7 @@ resources:
               Sid: 'Allow root use of the key'
               Effect: 'Allow'
               Principal:
-                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+                AWS: 'arn:aws:iam::${env:accountNumber}:root'
               Action:
                 - 'kms:Encrypt'
                 - 'kms:Decrypt'
@@ -187,7 +179,7 @@ resources:
             -
               Sid: 'Allow DynamoDB to use the key via Lambda'
               Effect: 'Allow'
-              Principal: 
+              Principal:
                 AWS: !GetAtt LambdaRole.Arn
               Action:
                 - 'kms:Encrypt'
@@ -197,8 +189,8 @@ resources:
                 - 'kms:DescribeKey'
                 - 'kms:CreateGrant'
               Condition:
-                StringLike: 
-                  kms:ViaService: 
+                StringLike:
+                  kms:ViaService:
                     - 'dynamodb.${self:provider.region}.amazonaws.com'
               Resource: '*'
 
@@ -220,7 +212,7 @@ resources:
               Sid: 'Allow root administration of the key'
               Effect: 'Allow'
               Principal:
-                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+                AWS: 'arn:aws:iam::${env:accountNumber}:root'
               Action:
                 - 'kms:*'
               Resource: '*'
@@ -228,7 +220,7 @@ resources:
               Sid: 'Allow root use of the key'
               Effect: 'Allow'
               Principal:
-                AWS: 'arn:aws:iam::${self:custom.accountNumber}:root'
+                AWS: 'arn:aws:iam::${env:accountNumber}:root'
               Action:
                 - 'kms:Encrypt'
                 - 'kms:Decrypt'
@@ -239,7 +231,7 @@ resources:
             -
               Sid: 'Allow S3 to use the key for encryption via Lambda'
               Effect: 'Allow'
-              Principal: 
+              Principal:
                 AWS: !GetAtt LambdaRole.Arn
               Action:
                 - 'kms:Encrypt'
@@ -249,10 +241,10 @@ resources:
                 - 'kms:DescribeKey'
                 - 'kms:CreateGrant'
               Condition:
-                StringLike: 
+                StringLike:
                   kms:ViaService: 's3.${self:provider.region}.amazonaws.com'
-                  kms:CallerAccount: '${self:custom.accountNumber}'
-              Resource: 
+                  kms:CallerAccount: '${env:accountNumber}'
+              Resource:
                 - '*'
 
     S3KMSAlias:
@@ -269,7 +261,7 @@ resources:
           - AttributeName: email
             AttributeType: S
           - AttributeName: captureDate
-            AttributeType: S            
+            AttributeType: S
         KeySchema:
           - AttributeName: email
             KeyType: HASH
@@ -286,7 +278,7 @@ resources:
     S3BucketSite:
       Type: 'AWS::S3::Bucket'
       Properties:
-        BucketName: '${self:provider.stage}-${self:service}-site-${self:provider.region}-${self:custom.accountNumber}'
+        BucketName: '${self:provider.stage}-${self:service}-site-${self:provider.region}-${env:accountNumber}'
         CorsConfiguration:
           CorsRules:
             -
@@ -305,7 +297,7 @@ resources:
     S3BucketData:
       Type: 'AWS::S3::Bucket'
       Properties:
-        BucketName: '${self:provider.stage}-${self:service}-data-${self:provider.region}-${self:custom.accountNumber}'
+        BucketName: '${self:provider.stage}-${self:service}-data-${self:provider.region}-${env:accountNumber}'
         CorsConfiguration:
           CorsRules:
             -
@@ -319,7 +311,7 @@ resources:
                 - POST
                 - DELETE
                 - HEAD
-              MaxAge: 3000 
+              MaxAge: 3000
         BucketEncryption:
           ServerSideEncryptionConfiguration:
             - ServerSideEncryptionByDefault:
